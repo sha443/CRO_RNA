@@ -3,7 +3,7 @@ import population
 
 def main():
 
-	filename = "../data/HPeV1.txt"
+	filename = "../data/TYMV.txt"
 	file = open(filename,"r",)
 	sequence = file.readline()
 	#print(sequence)
@@ -11,13 +11,11 @@ def main():
 	#----------------------------------------------------------------------------------------------
 	# Population generation
 	#----------------------------------------------------------------------------------------------
-	noOfPopulation = 50
+	noOfPopulation = 5
 	dotplot = population.Checkerboard(sequence)
 	infoTable = population.FindDiagonal(sequence,dotplot)
-	molecule, stemPool, infoEnergy = population.GenerateMolecule(len(sequence),noOfPopulation,infoTable)
-	population.PrintInfo(molecule,stemPool,infoEnergy)
-
-	#population.Overlap(molecule,stemPool)
+	molecule, stemPool, infoEnergy, moleculeEnergy = population.GenerateMolecule(sequence,len(sequence),noOfPopulation,infoTable)
+	population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
 
 main()
 

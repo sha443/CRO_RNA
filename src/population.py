@@ -57,10 +57,10 @@ def FindDiagonal(sequence,dotplot):
     
 
 # Generates given number of molecules
-def GenerateMolecule(sequenceLength,nPopulation,infoTable):
+def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
     molecule = []
     stemPool = []   
-    
+    molecule_energy = []
 
 
     for t in range(nPopulation):
@@ -171,7 +171,7 @@ def GenerateMolecule(sequenceLength,nPopulation,infoTable):
                             if(overlap2==2):
                                 break
                             if (flag[u] == 2 and flag[v] == 2):
-                                print("matched at:",u,v)
+                               # print("matched at:",u,v)
                                 flag[u] = 3
                                 mol2[u] = '['
                                 flag[v] = 3
@@ -179,7 +179,7 @@ def GenerateMolecule(sequenceLength,nPopulation,infoTable):
                                 extra+=1
                             elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
                                 overlap2+=1
-                                print("overlaped at:",u,v)
+                               # print("overlaped at:",u,v)
 
                                 flag[u] = 3
                                 mol2[u] = '['
@@ -202,6 +202,78 @@ def GenerateMolecule(sequenceLength,nPopulation,infoTable):
         # end for i,j,l1
 
         # Energy calculation
+        flag1 = 0   # Found au/gu penalty
+        flag2 = 0   # Check if it is the first input
+        flag3 = 0
+        flag4 = 0
+        total_energy = 0
+        energy = 0
+        infoEnergy.sort()
+        for i in range(len(infoEnergy)-1):
+            
+            if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
+                flag3 = 1
+                flag4 = 1
+                if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+                    flag1 = 1
+                    flag2 = 1
+                    energy += .45
+                    energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+                else:
+                    energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+            else:
+                flag4 = 2
+                if(flag3==1):
+                    if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+                        energy += .45
+                        energy += .43
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                    else:
+                        if(flag1==1):
+                            energy += .43
+                            energy += 4.09
+                            total_energy += energy
+                            flag2 = 0
+                            flag1 = 0
+                        elif(flag1 != 1):
+                            energy += 4.09
+                            total_energy += energy
+                            flag2 = 0
+                            flag1 = 0
+                        # Endifelse
+                    flag3 = 0
+                #Endif
+            #Endelse
+        #Endfor
+        if (flag4 != 2):            
+            if (flag3 == 1):
+                if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
+                    energy += .45
+                    energy += .43
+                    energy += 4.09
+                    total_energy += energy
+                    flag2 = 0
+                    flag1 = 0
+                else:
+                    if (flag1 == 1):
+                        energy += .43
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                    elif (flag1 != 1):
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                flag3 = 0
+                #Endif
+            #Endif
+        # Endif
+        molecule_energy.append(total_energy)
 
 
         # Add molecules to the mole
@@ -217,7 +289,7 @@ def GenerateMolecule(sequenceLength,nPopulation,infoTable):
         #pool.clear()
         #mol.clear()
 
-    return molecule,stemPool,infoEnergy
+    return molecule,stemPool,infoEnergy, molecule_energy
 def RemoveParanthesis(u,v,mol2,makePair):
     for j,k in makePair:
         if(u==j):
@@ -313,107 +385,107 @@ def Equal12(flagValid,j,k):
 def CalculateEnergy(p1, p2, p3, p4):
         
     ene = 0
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'A' and p4 == 'U') or (p1 == 'U' and p2 == 'A' and p3 == 'U' and p4 == 'A')):
     
         ene = -.93
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'U' and p4 == 'A')):
     
         ene = -1.10
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'G' and p4 == 'U') or (p1 == 'U' and p2 == 'G' and p3 == 'U' and p4 == 'A')):
     
         ene = -.55
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'U' and p4 == 'G') or (p1 == 'G' and p2 == 'U' and p3 == 'U' and p4 == 'A')):
     
         ene = -1.36
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'G' and p4 == 'C') or (p1 == 'C' and p2 == 'G' and p3 == 'U' and p4 == 'A')):
     
         ene = -2.08
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'a')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'C' and p4 == 'G') or (p1 == 'G' and p2 == 'C' and p3 == 'U' and p4 == 'A')):
     
         ene = -2.24
         return ene
     
-    if ((p1 == 'u' and p2 == 'a' and p3 == 'a' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'A' and p3 == 'A' and p4 == 'U')):
     
         ene = -1.33
         return ene
     
-    if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'a' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'A' and p3 == 'G' and p4 == 'U') or (p1 == 'U' and p2 == 'G' and p3 == 'A' and p4 == 'U')):
     
         ene = -1.0
         return ene
     
-    if ((p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'a' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'A' and p3 == 'U' and p4 == 'G') or (p1 == 'G' and p2 == 'U' and p3 == 'A' and p4 == 'U')):
     
         ene = -1.27
         return ene
     
-    if ((p1 == 'u' and p2 == 'a' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'a' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'A' and p3 == 'C' and p4 == 'G') or (p1 == 'G' and p2 == 'C' and p3 == 'A' and p4 == 'U')):
     
         ene = -2.35
         return ene
     
-    if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 's' and p3 == 'u' and p4 == 's')):
+    if ((p1 == 'A' and p2 == 'U' and p3 == 'A' and p4 == 'U') or (p1 == 'U' and p2 == 's' and p3 == 'U' and p4 == 's')):
     
         ene = -.93
         return ene
     
-    if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'a' and p4 == 'u') or (p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
+    if ((p1 == 'U' and p2 == 'A' and p3 == 'G' and p4 == 'C') or (p1 == 'C' and p2 == 'G' and p3 == 'A' and p4 == 'U') or (p1 == 'G' and p2 == 'U' and p3 == 'G' and p4 == 'C') or (p1 == 'C' and p2 == 'G' and p3 == 'U' and p4 == 'G')):
     
         ene = -2.11
         return ene
     
-    if ((p1 == 'g' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'g')):
+    if ((p1 == 'G' and p2 == 'U' and p3 == 'C' and p4 == 'G') or (p1 == 'G' and p2 == 'C' and p3 == 'U' and p4 == 'G')):
     
         ene = -2.51
         return ene
     
-    if ((p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
+    if ((p1 == 'G' and p2 == 'U' and p3 == 'G' and p4 == 'U') or (p1 == 'U' and p2 == 'G' and p3 == 'U' and p4 == 'G')):
     
         ene = -.5
         return ene
     
-    if ((p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'g')):
+    if ((p1 == 'G' and p2 == 'U' and p3 == 'U' and p4 == 'G')):
     
         ene = +1.29
         return ene
     
-    if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'G' and p3 == 'G' and p4 == 'C') or (p1 == 'C' and p2 == 'G' and p3 == 'G' and p4 == 'U')):
     
         ene = -1.41
         return ene
     
-    if ((p1 == 'u' and p2 == 'g' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'G' and p3 == 'C' and p4 == 'G') or (p1 == 'G' and p2 == 'C' and p3 == 'G' and p4 == 'U')):
     
         ene = -1.53
         return ene
     
-    if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
+    if ((p1 == 'U' and p2 == 'G' and p3 == 'G' and p4 == 'U')):
     
         ene = +.3
         return ene
     
-    if ((p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'c')):
+    if ((p1 == 'C' and p2 == 'G' and p3 == 'G' and p4 == 'C')):
     
         ene = -2.36
         return ene
     
-    if ((p1 == 'g' and p2 == 'c' and p3 == 'c' and p4 == 'g')):
+    if ((p1 == 'G' and p2 == 'C' and p3 == 'C' and p4 == 'G')):
     
         ene = -3.42
         return ene
     
-    if ((p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'c' and p4 == 'g')):
+    if ((p1 == 'G' and p2 == 'C' and p3 == 'G' and p4 == 'C') or (p1 == 'C' and p2 == 'G' and p3 == 'C' and p4 == 'G')):
     
         ene = -3.26
         return ene
@@ -429,23 +501,26 @@ def SequenceGenerator(size):
     random.shuffle(numbers)
     return numbers
 
-def PrintInfo(molecule,stemPool,infoEnergy):
+def PrintInfo(molecule,stemPool,infoEnergy, moleculeEnergy):
     file = open("output.txt","w+")
-    print("Stempool")
-    for pools in stemPool:
-        for start,end,length in pools:
-           print(start,end,length)
-        print("\n")
+    # print("Stempool")
+    # for pools in stemPool:
+    #     for start,end,length in pools:
+    #        print(start,end,length)
+    #     print("\n")
 
     print("Molecule")
+    index=0
     for mol in molecule:
         for i in range(len(mol)):
             print(mol[i],end="")
             file.write(mol[i])
+        file.write("\t"+str(moleculeEnergy[index]))
+        index+=1
         file.write("\n")
         print("\n")
 
-    print("infoEnergy")
-    for j,k in infoEnergy:
-        print(j,k)
-    print("\n")
+    # print("infoEnergy")
+    # for j,k in infoEnergy:
+    #     print(j,k)
+    # print("\n")
