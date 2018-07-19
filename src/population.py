@@ -1,9 +1,10 @@
 import random
 
-board = []
-infoTable = []
+
+
 infoEnergy = []
-stemPool = []
+
+
 # Cheeck if it makes a valid base pair of RNA
 def IsPair(c1,c2):
     if((c1=="A" and c2=="U") or (c1=="U" and c2=="A")):
@@ -17,7 +18,7 @@ def IsPair(c1,c2):
 
 # Make dotplot for RNA sequence
 def Checkerboard(sequence):
-
+    board = []
     for i in range(0,len(sequence)-1):
         board.append([])
         for j in range(0,len(sequence)-1):
@@ -32,20 +33,21 @@ def Checkerboard(sequence):
     #for i in range(0,len(sequence)-1):
     #    for j in range(0,len(sequence)-1):
     #        print(board[i][j])
-     #   print("\n")
-
+    #   print("\n")
+    return board
 # Finding consecutive 4 or more diagonal 1's in board
-def FindDiagonal(sequence):
+def FindDiagonal(sequence,dotplot):
     info = []
+    infoTable = []
     for i in range(len(sequence)-2,0,-1):
         for j in range(0,len(sequence)-2):
-            if(board[i][j]==1 and board[i-1][j+1]==1):
+            if(dotplot[i][j]==1 and dotplot[i-1][j+1]==1):
                 count=0
                 k=0
                 while True:
-                    if (board[i-k][j+k] == 1):
+                    if (dotplot[i-k][j+k] == 1):
                         count+=1
-                        board[i - k][j + k] = 2
+                        dotplot[i - k][j + k] = 2
                     else:
                         break
                     k = k+1
@@ -53,21 +55,23 @@ def FindDiagonal(sequence):
                     info.append((j,i,count))  # start, end, length
 
     # sort info table
-    global infoTable
     infoTable = sorted(info, key=lambda x: x[2],reverse=True)
-    #print(infoTable)
+    
+    return infoTable
     
 
 # Generates given number of molecules
-def GenerateMolecule(sequenceLength,nPopulation):
-
+def GenerateMolecule(sequenceLength,nPopulation,infoTable):
+    molecule = []
+    stemPool = []   
     flag = []
     flagValid = []
-    molecule = []
-    mol = []
     makePair = []
 
+
     for t in range(nPopulation):
+        pool = []
+        mol = []    
 
         # Initialization
         for i in range(sequenceLength):
@@ -79,12 +83,12 @@ def GenerateMolecule(sequenceLength,nPopulation):
         pair = 0
         pairIndex=0
         stempoolIndex =0
-
-
         stem = 0
 
         # Randomize the infoTable for each time population generation
         random.shuffle(infoTable)
+        flagStemPool=0
+
         # Find for new population
         for start,end,length in infoTable:
             # Search inside for making bond
@@ -95,6 +99,7 @@ def GenerateMolecule(sequenceLength,nPopulation):
                     flagValid[j] = 1 # )
                     flagValid[k] = 2 # (
                     stem+=1
+            # End for j,k
 
             # Can make at least 3 stems and the inside brackets are enclosed
             revoke = 0 #Take back all the actions
@@ -110,6 +115,8 @@ def GenerateMolecule(sequenceLength,nPopulation):
                     else:
                         revoke = 1
                         break
+                # End for j,k
+
                 if(revoke==1):
                     for j,k in zip(range(start,start+length,1),range(end,0,-1)):
                         if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
@@ -117,7 +124,11 @@ def GenerateMolecule(sequenceLength,nPopulation):
                             flag[k] = 0
                             flagValid[j] = 0
                             flagValid[k] = 0
-                    stemPool.append((start,end,length))
+                    flagStemPool = 1
+            # End if stem>=3
+            
+
+
             else:
                 for j,k in zip(range(start,start+length,1),range(end,0,-1)):
                     if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
@@ -125,19 +136,33 @@ def GenerateMolecule(sequenceLength,nPopulation):
                         flag[k] = 0
                         flagValid[j] = 0
                         flagValid[k] = 0
-                stemPool.append((start,end,length))
-        
-        molecule.append(mol)
-        for i in range(len(mol)):
-            print(mol[i],end="")
-        print("\n")
+                flagStemPool = 1
 
+            if(flagStemPool==1):
+                pool.append((start,end,length))
+                flagStemPool =0
+
+        # End start, end, length
+
+        # Add molecules to the mole
+        molecule.append(mol)
+        stemPool.append(pool)
+
+        
 
         # Clear all 
-        mol.clear()
+       
         flagValid.clear()
         flag.clear()
-            
+
+        # no need to clear these, because defined in loop
+        #pool.clear()
+        #mol.clear()
+
+        # add individual stempools to main stempool
+    return molecule,stemPool
+    
+
 def Equal12(flagValid,j,k):
 
     one=0
@@ -274,3 +299,18 @@ def SequenceGenerator(size):
         numbers.append(i)
     random.shuffle(numbers)
     return numbers
+
+def PrintInfo(molecule,stemPool):
+
+    x =0
+    for pools in stemPool:
+        x +=1
+        print(x)
+        for start,end,length in pools:
+           print(start,end,length)
+        print("\n")
+
+    for mol in molecule:
+        for i in range(len(mol)):
+            print(mol[i],end="")
+        print("\n")

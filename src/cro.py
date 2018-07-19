@@ -7,9 +7,15 @@ def main():
 	file = open(filename,"r",)
 	sequence = file.readline()
 	#print(sequence)
-	population.Checkerboard(sequence)
-	population.FindDiagonal(sequence)
-	population.GenerateMolecule(len(sequence),25)
 
+	#----------------------------------------------------------------------------------------------
+	# Population generation
+	#----------------------------------------------------------------------------------------------
+	noOfPopulation = 10
+	dotplot = population.Checkerboard(sequence)
+	infoTable = population.FindDiagonal(sequence,dotplot)
+	molecule, stemPool = population.GenerateMolecule(len(sequence),noOfPopulation,infoTable)
+	population.PrintInfo(molecule,stemPool)
 
 main()
+
