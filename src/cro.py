@@ -1,5 +1,6 @@
 import os
 import population
+import onwall
 
 def main():
 
@@ -11,11 +12,13 @@ def main():
 	#----------------------------------------------------------------------------------------------
 	# Population generation
 	#----------------------------------------------------------------------------------------------
-	noOfPopulation = 5
+	noOfPopulation = 50
 	dotplot = population.Checkerboard(sequence)
 	infoTable = population.FindDiagonal(sequence,dotplot)
-	molecule, stemPool, infoEnergy, moleculeEnergy = population.GenerateMolecule(sequence,len(sequence),noOfPopulation,infoTable)
+	molecule, stemPool, infoEnergy, moleculeEnergy, moleculeTable = population.GenerateMolecule(sequence,len(sequence),noOfPopulation,infoTable)
 	population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
+
+	#onwall.OnWall(moleculeTable)
 
 main()
 

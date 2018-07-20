@@ -61,6 +61,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
     molecule = []
     stemPool = []   
     molecule_energy = []
+    moleculeTable = []
 
 
     for t in range(nPopulation):
@@ -70,6 +71,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         infoEnergy = []
         pool = []
         mol = []    
+        moleculeSequence = []
 
         # Initialization
         for i in range(sequenceLength):
@@ -84,8 +86,14 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         stem = 0
 
         # Randomize the infoTable for each time population generation
-        random.shuffle(infoTable)
+        #random.shuffle(infoTable)
+        infoTable1 = infoTable
+        # Molecule sequence generate for CRO operator 
+        for i in range(0,len(infoTable)-1):
+            moleculeSequence.append(random.randint(0, len(infoTable)-1))
+            infoTable[moleculeSequence[i]] = infoTable1[i]
         flagStemPool=0
+
 
         # Find for new population
         for start,end,length in infoTable:
@@ -279,6 +287,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         # Add molecules to the mole
         molecule.append(mol2)
         stemPool.append(pool)
+        moleculeTable.append(moleculeSequence)
 
     
         # Clear all    
@@ -289,7 +298,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         #pool.clear()
         #mol.clear()
 
-    return molecule,stemPool,infoEnergy, molecule_energy
+    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable
 def RemoveParanthesis(u,v,mol2,makePair):
     for j,k in makePair:
         if(u==j):
@@ -502,7 +511,7 @@ def SequenceGenerator(size):
     return numbers
 
 def PrintInfo(molecule,stemPool,infoEnergy, moleculeEnergy):
-    file = open("output.txt","w+")
+    file = open("..\data\output.txt","w+")
     # print("Stempool")
     # for pools in stemPool:
     #     for start,end,length in pools:
