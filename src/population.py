@@ -163,7 +163,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
                     l1 = k - (i + len1)
                     l2 = (j - len1 + 1) - (k + len2)
                     l3 = (l - len2) - j
-                    print(l1,l2,l3,"pseudoknot")
+                    #print(l1,l2,l3,"pseudoknot")
                     pseudoStem=0
                     extra=0
                     # for(u=k,v=l; u<k+len2; u++,v--)
