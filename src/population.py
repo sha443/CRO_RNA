@@ -70,7 +70,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         makePair = []
         infoEnergy = []
         pool = []
-        mol = []    
+        mol = []
         moleculeSequence = []
 
         # Initialization
@@ -152,12 +152,18 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         mol2 = mol  # make a duplicate of molecule
         for i,j,len1 in infoTable:
             for k,l,len2 in pool:
-
+               
                 overlap=0
                 overlap2=0
                 newBond=0
                 
                 if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+                    # Pseudoknot info
+                    # Loop lenght calculation for energy evaluation 
+                    l1 = k - (i + len1)
+                    l2 = (j - len1 + 1) - (k + len2)
+                    l3 = (l - len2) - j
+                    print(l1,l2,l3,"pseudoknot")
                     pseudoStem=0
                     extra=0
                     # for(u=k,v=l; u<k+len2; u++,v--)

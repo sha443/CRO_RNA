@@ -1,43 +1,47 @@
-def decomposition (molecule)
-        
-    int[] m1 = new int[m.Length]
-    int[] m2 = new int[m.Length]
-    int mid = m.Length / 2
-    for (int i = 0 i < mid i++ )
-    
-        m1[i] = m[i]
-    
-    for (int i = mid i < m.Length i++ )
-    
-        m2[i] = m[i]
-    
-    for (int i = mid i < m.Length i++ )
-    
-        for (int i1 = 0 i1 < 4000 i1++)
-        
-            for (int i2 = 0 i2 < 2000 i2++)
-            
+import random
 
-            
+def Decomposition (molecule):
         
+    length = len(molecule)
+    m1 = list(range(length))
+    m2 = list(range(length))
+    mid =int(length/2)
 
-        m1[i] = rand.Next(0, m.Length)
-    
-    for (int i = 0 i < mid i++)
-    
-        for (int i1 = 0 i1 < 4000 i1++)
+
+    # First half goes to the first half of the new molecule1
+    for i in range(0,mid):
+        m1[i] = molecule[i]
+    #Endfor
+    # Second half goes to the second half of the new molecule2
+    for i in range(mid,length):
+        m2[i] = molecule[i]
+    #Endfor
+
+    # Molecule1 second half randomly chosen
+    for i in range(mid,length):
+        for j in range(4000):
+            for k in range(200):
+                pass
+            #Endfor
+        #Endfor
+        m1[i] = random.randint(0, length)
+    #Endfor
+
+    # Molecule2 first half randomly chosen
+    for i in range(0,mid):
+        for j in range(4000):
+            for k in range(200):
+                pass
+            #Endfor
+        #Endfor
+        m2[i] = random.randint(0, length)
+    #Endfor
         
-            for (int i2 = 0 i2 < 2000 i2++)
-            
+    #test
+    # print(m1)
+    # print(m2)
+    # Return 2 new molecule
+    return m1,m2
 
-            
-        
-
-        m2[i] = rand.Next(0, m.Length)
-    
-    m_new.Add(m1)
-    m_new.Add(m2)
-
-    return m_new
-        
-    
+#Module Test
+#Decomposition([3, 2, 0, 5, 8, 10, 5, 2, 5, 1])

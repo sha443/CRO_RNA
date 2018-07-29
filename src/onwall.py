@@ -16,6 +16,9 @@ def OnWall (molecule):
             moleculeNew[i] =  j - molecule[i]
         # Endif
     #Endif
-    print(moleculeNew)
+    #print(moleculeNew)
+    
     return moleculeNew
-        
+
+#Module Test
+#OnWall([3, 2, 0, 5, 8, 10, 5, 2, 5, 1])
