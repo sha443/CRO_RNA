@@ -86,11 +86,17 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         stem = 0
 
         # Randomize the infoTable for each time population generation
-        #random.shuffle(infoTable)
+        # random.shuffle(infoTable)
         infoTable1 = infoTable
         # Molecule sequence generate for CRO operator 
+        # problem; duplicate vales 
         for i in range(0,len(infoTable)-1):
-            moleculeSequence.append(random.randint(0, len(infoTable)-1))
+            moleculeSequence.append(i)
+            #moleculeSequence.append(random.randint(0, len(infoTable)-1))
+
+        # Stem list after permutation is the population
+        random.shuffle(moleculeSequence)
+        for i in range(0,len(infoTable)-1):
             infoTable[moleculeSequence[i]] = infoTable1[i]
         flagStemPool=0
 
@@ -294,6 +300,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         molecule.append(mol2)
         stemPool.append(pool)
         moleculeTable.append(moleculeSequence)
+        # moleculeTable.append(infoTable)
 
     
         # Clear all    
@@ -304,7 +311,7 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         #pool.clear()
         #mol.clear()
 
-    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable
+    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,infoTable
 def RemoveParanthesis(u,v,mol2,makePair):
     for j,k in makePair:
         if(u==j):

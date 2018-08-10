@@ -1,4 +1,5 @@
 import random
+import pseudoknot
 from operators import Operators
 from molecule import Molecule
 class CRO():
@@ -22,6 +23,7 @@ class CRO():
 	sequence = ''
 	mol = None
 
+
 	######################################################################
 	# CRO Init
 	######################################################################
@@ -39,7 +41,7 @@ class CRO():
 	######################################################################
 	# OnWall Ineffective Colision handler
 	######################################################################
-	def OnwallIneffectiveCollision(self,oldMol, index):
+	def OnwallIneffectiveCollision(self,mol,oldMol, index):
 		operator = Operators()
 		newMol = operator.OnWall(oldMol)
 		PEnew = CRO().CalculatePE(newMol)
@@ -47,9 +49,9 @@ class CRO():
 		mol.numHit[index] = mol.numHit[index] + 1
 		t = mol.PE1[index] + mol.KE1[index]
 		if (t>=PEnew):
-			a = (random.uniform(0,1) * (1-KELossRate))+KELossRate
+			a = (random.uniform(0,1) * (1-self.KELossRate))+self.KELossRate
 			KEnew = (mol.PE1[index] - PEnew + mol.KE1[index])*a
-			mol.Molecule_list[index] = newMol
+			mol.moleculeTable[index] = newMol
 			mol.PE1[index] = PEnew
 			mol.KE1[index] = KEnew
 			if(mol.PE1[index]<mol.minPE[index]):
@@ -103,7 +105,7 @@ class CRO():
 	            #endif
 				else:
 					++on
-					CRO().OnwallIneffectiveCollision(mol.moleculeTable[index], index)
+					CRO().OnwallIneffectiveCollision(mol,mol.moleculeTable[index], index)
 	            #end else
 	        #endif
 
@@ -134,119 +136,463 @@ class CRO():
 			#endfor
 		#end for i
 	#end cro
-	def CalculatePE():
-		pass
-	def CalculateEnergy(p1,p2,p3,p4):
-        
-            ene = 0
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'a')):
-                ene = -.93
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
-            
-                ene = -1.10
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
-            
-                ene = -.55
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
-            
-                ene = -1.36
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
-            
-                ene = -2.08
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'a')):
-            
-                ene = -2.24
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'a' and p3 == 'a' and p4 == 'u')):
-            
-                ene = -1.33
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'a' and p4 == 'u')):
-            
-                ene = -1.0
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'a' and p4 == 'u')):
-            
-                ene = -1.27
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'a' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'a' and p4 == 'u')):
-            
-                ene = -2.35
-                return ene
-            
-            if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 's' and p3 == 'u' and p4 == 's')):
-            
-                ene = -.93
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'a' and p4 == 'u') or (p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
-            
-                ene = -2.11
-                return ene
-            
-            if ((p1 == 'g' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'g')):
-            
-                ene = -2.51
-                return ene
-            
-            if ((p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
-            
-                ene = -.5
-                return ene
-            
-            if ((p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'g')):
-            
-                ene = +1.29
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
-            
-                ene = -1.41
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'g' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'u')):
-            
-                ene = -1.53
-                return ene
-            
-            if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
-            
-                ene = +.3
-                return ene
-            
-            if ((p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'c')):
-            
-                ene = -2.36
-                return ene
-            
-            if ((p1 == 'g' and p2 == 'c' and p3 == 'c' and p4 == 'g')):
-            
-                ene = -3.42
-                return ene
-            
-            if ((p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'c' and p4 == 'g')):
-            
-                ene = -3.26
-                return ene
-            
-            return ene
+	def IsPair(c1,c2):
+	    if((c1=="A" and c2=="U") or (c1=="U" and c2=="A")):
+	        return 1
+	    elif ((c1=="G" and c2=="C") or (c1=="C" and  c2=="G")):
+	        return 1
+	    elif ((c1=="G" and c2=="U") or (c1=="U" and c2=="G")):
+	        return 1
+	    else:
+	        return 0
+    #end
+	def Checkerboard(self,sequence):
+		board = []
+		for i in range(len(sequence)-1):
+		    board.append([])
+		    for j in range(0,len(sequence)-1):
+		        if(j<i):
+		            if(IsPair(sequence[i],sequence[j])):
+		                board[i].append(1)
+		            else:
+		                board[i].append(0)
+		        else:
+		            board[i].append(0)
+		return board
+	#End
+	def FindDiagonal(self,size,dotplot):
+		info = []
+		infoTable = []
+		for i in range(size-1,0,-1):
+		    for j in range(size-2):
+		        if(dotplot[i][j]==1 and dotplot[i-1][j+1]==1):
+		            count=0
+		            k=0
+		            while True:
+		                if (dotplot[i-k][j+k] == 1):
+		                    count+=1
+		                    dotplot[i - k][j + k] = 2
+		                else:
+		                    break
+		                k = k+1
+		            if(count>3):
+		                info.append((j,i,count))  # start, end, length
 
-C  = CRO()
-mol = Molecule()
-mol.Mol("CAAUUUUCUGAAAAUUUUCAC", 10, 1)
-C.Init(10, .5, .4, 1, 1, 5, 0, "AUGC", mol)
-C.CRO(10, .5, .4, 1, 1, 5, 0, "AUGC", mol,10,"output")
+		# sort info table
+		infoTable = sorted(info, key=lambda x: x[2],reverse=True)
+		return infoTable
+	#End
+	def CalculatePE(self,w):
+		molecule = []
+		stemPool = []   
+		molecule_energy = []
+		moleculeTable = []
+		zero_one = []
+		size = len(self.sequence)
+
+		# Making dotplot
+		zero_one = CRO().Checkerboard(self.sequence)
+		# finding the diagonal 1 and mark 0, creating sorted entry table.
+		zero_one_2 = zero_one
+		infoTable = CRO().FindDiagonal(size,zero_one_2)
+
+		# Declaration of Variables
+		flag = []
+		flagValid = []
+		makePair = []
+		infoEnergy = []
+		pool = []
+		mol = []
+		moleculeSequence = []
+
+		# Initialization
+		for i in range(size):
+		    flag.append(0)
+		    flagValid.append(0)
+		    mol.append(".")
+
+		# Adding paranthesis
+		pair = 0
+		pairIndex=0
+		stempoolIndex =0
+		stem = 0
+
+		# Randomize the infoTable for each time population generation
+		#random.shuffle(infoTable)
+		infoTable1 = infoTable
+		# Molecule sequence generate for CRO operator 
+		for i in range(0,len(infoTable)-1):
+		    moleculeSequence.append(random.randint(0, len(infoTable)-1))
+		    infoTable[moleculeSequence[i]] = infoTable1[i]
+		flagStemPool=0
+        
+
+		# Find for new population
+		for start,end,length in infoTable:
+		    # Search inside for making bond
+		    for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+		        if(flag[j]==0 and flag[k]==0):
+		            flag[j] = 2
+		            flag[k] = 2
+		            flagValid[j] = 1 # )
+		            flagValid[k] = 2 # (
+		            stem+=1
+		    # End for j,k
+
+		    # Can make at least 3 stems and the inside brackets are enclosed
+		    revoke = 0 #Take back all the actions
+		    if stem>=3:
+		        for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+		            if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
+		                flag[j] = 1
+		                flag[k] = 1
+		                mol[j] = "("
+		                mol[k] = ")"
+		                infoEnergy.append((j,k))  # start, end
+		                makePair.append((j,k))
+		            else:
+		                revoke = 1
+		                break
+		        # End for j,k
+
+		        if(revoke==1):
+		            for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+		                if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
+		                    flag[j] = 0
+		                    flag[k] = 0
+		                    flagValid[j] = 0
+		                    flagValid[k] = 0
+		            flagStemPool = 1
+		    # End if stem>=3
+
+		    else:
+		        for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+		            if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
+		                flag[j] = 0
+		                flag[k] = 0
+		                flagValid[j] = 0
+		                flagValid[k] = 0
+		        flagStemPool = 1
+
+		    if(flagStemPool==1):
+		        pool.append((start,end,length))
+		        flagStemPool =0
+
+		# End start, end, length
+
+		# Finding pseudoknot
+		mol2 = mol  # make a duplicate of molecule
+		for i,j,len1 in infoTable:
+		    for k,l,len2 in pool:
+		       
+		        overlap=0
+		        overlap2=0
+		        newBond=0
+		        
+		        if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+		            # Pseudoknot info
+		            # Loop lenght calculation for energy evaluation 
+		            l1 = k - (i + len1)
+		            l2 = (j - len1 + 1) - (k + len2)
+		            l3 = (l - len2) - j
+		            #print(l1,l2,l3,"pseudoknot")
+		            pseudoStem=0
+		            extra=0
+		            # for(u=k,v=l u<k+len2 u++,v--)
+		            for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+		                if(overlap>=2):
+		                    break
+		                if(flag[u]==0 and flag[v]==0):
+		                    flag[u] = 2
+		                    flag[v] = 2
+		                    extra+=1
+		                    pseudoStem+=1
+		                elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
+		                    overlap+=1
+		                    pseudoStem+=1
+		            # End for u,v
+		            if(pseudoStem>=2):
+		                extra=0
+		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+		                    if(overlap2==2):
+		                        break
+		                    if (flag[u] == 2 and flag[v] == 2):
+		                       # print("matched at:",u,v)
+		                        flag[u] = 3
+		                        mol2[u] = '['
+		                        flag[v] = 3
+		                        mol2[v] = ']'
+		                        extra+=1
+		                    elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
+		                        overlap2+=1
+		                       # print("overlaped at:",u,v)
+
+		                        flag[u] = 3
+		                        mol2[u] = '['
+		                        flag[v] = 3
+		                        mol2[v] = ']'
+		                        mol2 = RemoveParanthesis(u,v,mol2,makePair)
+		                    # End if
+		                # End for u,v
+		            # End pseudostem
+		            else: # Revoke the flag status
+		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+		                    if(flag[u] == 2 and flag[v] == 2):
+		                        flag[u] = 0
+		                        flag[v] = 0
+		                    # endif
+		                # End for u,v
+		            #end main loop
+		        # end pseudo condition
+		    # end for k,l, l2
+		# end for i,j,l1
+
+		# Energy calculation
+		flag1 = 0   # Found au/gu penalty
+		flag2 = 0   # Check if it is the first input
+		flag3 = 0
+		flag4 = 0
+		total_energy = 0
+		energy = 0
+		infoEnergy.sort()
+		for i in range(len(infoEnergy)-1):
+		    
+		    if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
+		        flag3 = 1
+		        flag4 = 1
+		        if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+		            flag1 = 1
+		            flag2 = 1
+		            energy += .45
+		            energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+		        else:
+		            energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+		    else:
+		        flag4 = 2
+		        if(flag3==1):
+		            if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+		                energy += .45
+		                energy += .43
+		                energy += 4.09
+		                total_energy += energy
+		                flag2 = 0
+		                flag1 = 0
+		            else:
+		                if(flag1==1):
+		                    energy += .43
+		                    energy += 4.09
+		                    total_energy += energy
+		                    flag2 = 0
+		                    flag1 = 0
+		                elif(flag1 != 1):
+		                    energy += 4.09
+		                    total_energy += energy
+		                    flag2 = 0
+		                    flag1 = 0
+		                # Endifelse
+		            flag3 = 0
+		        #Endif
+		    #Endelse
+		#Endfor
+		if (flag4 != 2):            
+		    if (flag3 == 1):
+		        if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
+		            energy += .45
+		            energy += .43
+		            energy += 4.09
+		            total_energy += energy
+		            flag2 = 0
+		            flag1 = 0
+		        else:
+		            if (flag1 == 1):
+		                energy += .43
+		                energy += 4.09
+		                total_energy += energy
+		                flag2 = 0
+		                flag1 = 0
+		            elif (flag1 != 1):
+		                energy += 4.09
+		                total_energy += energy
+		                flag2 = 0
+		                flag1 = 0
+		        flag3 = 0
+		        #Endif
+		    #Endif
+		# Endif
+		molecule_energy.append(total_energy)
+
+
+		# Add molecules to the mole
+		molecule.append(mol2)
+		stemPool.append(pool)
+		moleculeTable.append(moleculeSequence)
+
+
+		# Clear all    
+		flagValid.clear()
+		flag.clear()
+
+		# no need to clear these, because defined in loop
+		#pool.clear()
+		#mol.clear()
+		return total_energy
+
+    
+	def CalculateEnergy(p1,p2,p3,p4):
+		ene = 0
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'a')):
+		    ene = -.93
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
+
+		    ene = -1.10
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
+
+		    ene = -.55
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
+
+		    ene = -1.36
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
+
+		    ene = -2.08
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'a')):
+
+		    ene = -2.24
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'a' and p3 == 'a' and p4 == 'u')):
+
+		    ene = -1.33
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'a' and p4 == 'u')):
+
+		    ene = -1.0
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'a' and p4 == 'u')):
+
+		    ene = -1.27
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'a' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'a' and p4 == 'u')):
+
+		    ene = -2.35
+		    return ene
+
+		if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 's' and p3 == 'u' and p4 == 's')):
+
+		    ene = -.93
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'a' and p4 == 'u') or (p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
+
+		    ene = -2.11
+		    return ene
+
+		if ((p1 == 'g' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'g')):
+
+		    ene = -2.51
+		    return ene
+
+		if ((p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
+
+		    ene = -.5
+		    return ene
+
+		if ((p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'g')):
+
+		    ene = +1.29
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
+
+		    ene = -1.41
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'g' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'u')):
+
+		    ene = -1.53
+		    return ene
+
+		if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
+
+		    ene = +.3
+		    return ene
+
+		if ((p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'c')):
+
+		    ene = -2.36
+		    return ene
+
+		if ((p1 == 'g' and p2 == 'c' and p3 == 'c' and p4 == 'g')):
+
+		    ene = -3.42
+		    return ene
+
+		if ((p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'c' and p4 == 'g')):
+
+		    ene = -3.26
+		    return ene
+
+		return ene
+	#End
+
+	def Performance(predicted):
+		code = None
+		code = open("../data/ref.txt","r").read()
+		true_basepair = 0
+		a = 0
+		c = 0
+		false_negative_basepair = 0
+		false_positive_basepair = 0
+		for i in range(len(predicted)):
+
+		    if ((predicted[i] == '(' or predicted[i] == '[' or predicted[i] == '') and (code[i] == '(' or code[i] == '[' or code[i] == '')):
+		    
+		        true_basepair+=1
+		    
+		    if ((predicted[i] != '(' or predicted[i] != '[' or predicted[i] != '') and (code[i] == '(' or code[i] == '[' or code[i] == '')):
+		    
+		        false_negative_basepair+=1
+		    
+		    if ((predicted[i]=='(' or predicted[i]=='[' or predicted[i]=='') and (code[i] !='(' or code[i] !='[' or code[i] !='')):
+		    
+		        false_positive_basepair+=1
+
+		sensitivity =( true_basepair/ (true_basepair + false_negative_basepair))*100.0
+		specificity =( true_basepair / (true_basepair + false_positive_basepair))*100.0
+		a, c
+		a = sensitivity * specificity * 2
+		c = sensitivity + specificity
+		f_measure = 0 #= a / c
+
+		return sensitivity,specificity,f_measure
+    #End
+
+
+
+# index=0
+# for m in mol.molecules:
+# 	sen,sp,f = CRO.Performance(m)
+	# print(sen)
+	# print(sp)
+	# print(f)
+	# for i in range(len(m)):
+	#     print(m[i],end="")
+	# index+=1
+	# print("\n")
+# index=0
+# for m in mol.minPE:
+#         #print(m,end="")
+#         index+=1
+#        # print("\n")

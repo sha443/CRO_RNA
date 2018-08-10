@@ -6,7 +6,6 @@ class Operators():
     ######################################################################
     def OnWall (self,molecule):
         moleculeNew = molecule
-
         i = random.randint(0, len(molecule)-1)
         j = random.randint(0, len(molecule)-1)
 
