@@ -19,9 +19,12 @@ def LoopsFulfill(l1, l2, l3):
                 loops_fulfilled = True
     
     return loops_fulfilled
+# end function
+
 def BuildPseudoknots(stemList):
 
     pkList = []
+    stems_shortened = {}
     for i,j, stemlength1 in stemList:
         for k,l, stemlength2 in stemList:
             #i, j = S1
@@ -42,12 +45,22 @@ def BuildPseudoknots(stemList):
                 # Case that overlap of 1 bp or 2 bps occurs at L2
                 if (l2 == -1 or l2 == -2) and (stemlength1 > 3 or stemlength2 > 3):
         
-                    marker, l1, l2, l3, stemlength1, stemlength2 = Overlap(l1, l2, l3, stemlength1, stemlength2)
+                    marker, l1, l2, l3, newStemlength1, newStemlength2 = Overlap(l1, l2, l3, stemlength1, stemlength2)
 
                     if marker:           
                         if LoopsFulfill(l1, l2, l3):
                         	#print(i,j,k,l,stemlength1,stemlength2,l1,l2,l3)
                             pkList.append((i, j, k, l, stemlength1, stemlength2, l1, l2, l3))
+
+                            # Add shortened stems to dictionary                            
+                            s1_shortened = i, j, stemlength1     
+                            if stemlength1 != newStemlength1:
+                                stems_shortened[s1_shortened] = newStemlength1, 0.0                                         
+                                
+                            s2_shortened = k, l, stemlength2
+
+                            if stemlength2 != newStemlength2:
+                                stems_shortened[s2_shortened] = newStemlength2, 0.0  
                         # endif
                     # endif
                 # endif
@@ -56,7 +69,8 @@ def BuildPseudoknots(stemList):
     # endfor
     # Make the list unique and return 
     pkList = list(set(pkList))
-    return pkList
+    return pkList,stems_shortened
+# end function
 
 def Overlap(l1, l2, l3, stemlength1, stemlength2):
 
@@ -87,7 +101,7 @@ def Overlap(l1, l2, l3, stemlength1, stemlength2):
             l2, marker = 0, False       # It is not possible to resolve the overlap          
 
     return marker, l1, l2, l3, stemlength1, stemlength2
-
+# end function
 def ScanList(pkList):
     cc06 = []
     cc09 = []
@@ -104,48 +118,4 @@ def ScanList(pkList):
                 longPk.append(pkStem)
         
     return cc06,cc09,longPk
-
-
-# Calling...
-# stems = []
-# stems.append((21 ,38 ,6 ))
-# stems.append((16 ,29 ,5 ))
-# stems.append((18 ,29 ,5 ))
-# stems.append((19 ,29 ,5 ))
-# stems.append((1 ,17 ,5 ))
-# stems.append((8 ,30 ,4 ))
-# stems.append((14 ,30 ,4 ))
-# stems.append((0 ,25 ,4 ))
-# stems.append((2 ,34 ,4 ))
-# stems.append((0 ,14 ,4 ))
-# stems.append((1 ,11 ,4 ))
-# stems.append((2 ,40 ,3 ))
-# stems.append((10 ,37 ,3 ))
-# stems.append((10 ,29 ,3 ))
-# stems.append((11 ,29 ,3 ))
-# stems.append((19 ,37 ,3 ))
-# stems.append((17 ,29 ,3 ))
-# stems.append((21 ,37 ,3 ))
-# stems.append((12 ,36 ,3 ))
-# stems.append((20 ,29 ,3 ))
-# stems.append((21 ,29 ,3 ))
-# stems.append((22 ,29 ,3 ))
-# stems.append((9 ,27 ,3 ))
-# stems.append((0 ,35 ,3 ))
-# stems.append((1 ,23 ,3 ))
-# stems.append((1 ,22 ,3 ))
-# stems.append((1 ,21 ,3 ))
-# stems.append((1 ,20 ,3 ))
-# stems.append((1 ,19 ,3 ))
-# stems.append((1 ,18 ,3 ))
-# stems.append((28 ,40 ,3 ))
-# stems.append((28 ,34 ,3 ))
-# stems.append((1 ,12 ,3 ))
-# stems.append((2 ,31 ,3 ))
-
-
-
-# pkList = BuildPseudoknots(stems)
-
-# cc06,cc09,longPk = ScanList(pkList)
-# print(pkList)
+# end function
