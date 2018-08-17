@@ -1,3 +1,6 @@
+import math
+import os
+
 # Loop entropy for loop L1 and stem S2 (deep groove)
 # First entry is loop size, second entry is stem size    
 loop1_dic_cc ={
@@ -52,14 +55,17 @@ stack_dic ={
 ('UA','AU') : -1.3 , ('UA','CG') : -2.4 , ('UA','GC') : -2.1 , ('UA','GU') : -1.0 , ('UA','UA') : -0.9 , ('UA','UG') : -1.3 ,
 ('UG','AU') : -1.0 , ('UG','CG') : -1.5 , ('UG','GC') : -1.4 , ('UG','GU') :  0.3 , ('UG','UA') : -0.6 , ('UG','UG') : -0.5 }
   
-
-def CC06(pkCC06,stem_dic,seq):
-	CC06Result = []
+#===================================================================================
+# Cao Chen 09 Energy Model
+#===================================================================================
+def CC06(pkCC06,stem_dic,stems_shortened_dic,seq):
+	CC06Result = {}
 	entropy_l1, entropy_l3 = 0.0, 0.0
 	for pkStem in pkCC06:
 		i, j, k, l, stemlength1, stemlength2, l1, l2, l3 = pkStem
 		stem1 = i, j
 		stem1_short = i, j, stemlength1
+		stack_s1, stack_s2 = 0,0
 
 		stack_s1 = wStack(stem1, stem1_short, stems_shortened_dic, stem_dic)
 		         
@@ -72,12 +78,14 @@ def CC06(pkCC06,stem_dic,seq):
 		l2 = (j - stemlength1 + 1) - (k + stemlength2)            
 		l3 = (l - stemlength2) - j
 
+		# Stem length restiction
 		if stemlength1 > 12:
 		    stemlength1 = 12
 		if stemlength2 > 12:
 		    stemlength2 = 12
 		    
 		# Coaxial stacking
+		coaxial_stacking = 0
 		if l2 == 0 or l2 == 1:
 		    coaxial_stacking = CoaxialStackingCalculation(seq, stemlength1, stemlength2, i, j, k, l) 
 		    # Weighting parameter              
@@ -111,28 +119,32 @@ def CC06(pkCC06,stem_dic,seq):
 		# endif
 
 		# Calculate free energy for pseudoknot
-		pk_energy = stack_s1 + stack_s2 + entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking
-
+		pk_energy = stack_s1 + stack_s2 - (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
+		# standard 0.0
 		if pk_energy < 0.0:
-		    CC06Result[pk_stem] = pk_energy, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 
+		    CC06Result[pkStem] = pk_energy #, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 
 		# endif
 
 	return CC06Result 
 	# endfor
 # end function
 
-def wStack(stem, stem_short, stems_shortened_dic, stem_dic):
+def wStack(stem, stem_short, stems_shortened_dic, stem_list):
+	if stem_short in stems_shortened_dic:    # Look up whether S1 is a shortened stem
+		stack = stems_shortened_dic[stem_short][0]
+	else:     
+		stack = FindLength(stem_list,stem[0],stem[1])
+	    # stack = stem_list[len]
+	return stack
+# end function
+def FindLength(fromList,searchBy1,searchby2):
 
-    if stem_short in stems_shortened_dic:    # Look up whether S1 is a shortened stem
-        stack = stems_shortened_dic[stem_short][2]
-        energy = stems_shortened_dic[stem_short][3]
-    else:     
-        stack = stem_dic[stem][2]
-        energy = stem_dic[stem][3] 
-  
-    threshold = stem_dic[stem][3] 
-  
-    return threshold, stack, energy
+	for stem in range(len(fromList)):
+		i,j,l = fromList[stem]
+		if(i==searchBy1 and j==searchby2):
+			return l
+		# endif
+	# endif
 # end function
 def CoaxialStackingCalculation(seq, stemlength1, stemlength2, i, j, k, l):
 
@@ -159,3 +171,130 @@ def CoaxialStackingCalculation(seq, stemlength1, stemlength2, i, j, k, l):
         coaxialStacking = 0.0
 
     return coaxialStacking
+# end function
+
+#===================================================================================
+# Cao Chen 09 Energy Model
+#===================================================================================
+def CC09(pk_dic_cc09, stem_dic):
+	pk_dic_cc09_result = {}
+	entropies_dic, entropies_dic_L1, entropies_dic_L3 = {}, {}, {}    
+
+	# Store entropy parameters in dictionary in format (s1, s2, l1, l3, l2)    
+	entropies = open("CaoChenParameters.txt",'r')
+	for line in entropies:
+		i = line.split()
+		quintet = int(i[0][3:]), int(i[1][3:]), int(i[2][3:]), int(i[3][3:]), int(i[4][3:])
+		entropies_dic[quintet] = float(i[5][3:])
+
+	# For long loops L1 > 7 nt AND L3 <= 7 nt 
+	# Store entropy parameters in dictionary in format (s1, s2, 'long', l3, l2)
+	entropies = open("CaoChenParameters_L1.txt",'r')
+	for line in entropies:
+		i = line.split()
+		a_b = float(i[4][7:]), float(i[5][7:])
+		quintet = int(i[0][3:]), int(i[1][3:]), 'long', int(i[2][3:]), int(i[3][3:])
+		entropies_dic_L1[quintet] = a_b
+
+	# For long loops L3 > 7 nt 
+	# Store entropy parameters in dictionary in format (s1, s2, l1, 'long', l2)
+	entropies = open("CaoChenParameters_L3.txt",'r')
+	for line in entropies:
+		i = line.split()
+		a_b = float(i[4][7:]), float(i[5][7:])
+		quintet = int(i[0][3:]), int(i[1][3:]), int(i[2][3:]), 'long', int(i[3][3:])
+		entropies_dic_L3[quintet] = a_b
+
+	for pk_stem in pk_dic_cc09:
+
+		i, j, k, l = pk_stem[0], pk_stem[1], pk_stem[2], pk_stem[3]
+
+		stemlength1 = pk_stem[4]
+		stack_s1 = FindLength(stem_dic,i,j)
+		energy_s1 = 0# stem_dic[stem1][3]        
+		    
+		stemlength2 = pk_stem[5]  
+		stack_s2 = FindLength(stem_dic,k,l)
+		energy_s2 = 0# stem_dic[stem2][3]    
+		                        
+		l1 = k - (i + stemlength1)
+		l2 = (j - stemlength1 + 1) - (k + stemlength2)            
+		l3 = (l - stemlength2) - j
+
+		if stemlength1 > 10:
+		    stemlength1 = 10
+		if stemlength2 > 10:
+		    stemlength2 = 10
+
+		# In case configuration is not defined in virtual bond model
+		entropy = 0.0
+
+		if l1 <= 7 and l3 >= 1 and l3 <= 7:     
+		    quintet = stemlength1, stemlength2, l1, l3, l2
+		    if quintet in entropies_dic:
+		        entropy = entropies_dic[quintet]
+		    
+		elif l1 <= 7 and l3 > 7:                 
+		    quintet = stemlength1, stemlength2, l1, 'long', l2
+		    if quintet in entropies_dic_L3:
+		        a_b = entropies_dic_L3[quintet]
+		        entropy = a_b[0] * math.log(l3) + a_b[1]
+		        
+		elif l1 > 7 and l3 >= 1 and l3 <= 7:     
+		    quintet = stemlength1, stemlength2, 'long', l3, l2    
+		    if quintet in entropies_dic_L1:
+		        a_b = entropies_dic_L1[quintet]
+		        entropy = a_b[0] * math.log(l1) + a_b[1]
+		        
+		elif l1 > 7 and l3 > 7:                 
+		    quintet = stemlength1, stemlength2, l1, 'long', l2
+		    if quintet in entropies_dic_L3:
+		        a_b = entropies_dic_L3[quintet]
+		        entropy = a_b[0] * math.log(l3) + a_b[1]
+
+		    
+		if entropy:
+		    pk_energy = stack_s1 + stack_s2 - (0.62 * entropy)
+		    if pk_energy < 0.0: 
+		        pk_dic_cc09_result[pk_stem] = pk_energy #, stack_s1, stack_s2, l1, l3, l2, 0.62 * entropy
+	return pk_dic_cc09_result #, entropies_dic, entropies_dic_L1, entropies_dic_L3
+#===================================================================================
+# LongPK Energy Model
+#===================================================================================
+def LongPK(pk_dic_longpk, stem_dic, INIT, PENALTY):
+    """ Function: dic_longpks()
+
+        Purpose:  Calculate pseudoknot free energies under energy model LongPK.
+                  Note that no shortened stems will occur here. 
+                  
+        Input:    Dictionary with pseudoknots where L2 >= 7.
+        
+        Return:   Dictionary with pseudoknots and associated free energy. 
+
+    """    
+    pk_dic_longpk_result = {}    
+
+    for pk_stem in pk_dic_longpk:
+
+        i, j, k, l = pk_stem[0], pk_stem[1], pk_stem[2], pk_stem[3]        
+      
+        stemlength1 = pk_stem[4]
+        stack_s1 = FindLength(stem_dic,i,j)
+                                                    
+        stemlength2 = pk_stem[5]
+        stack_s2 = FindLength(stem_dic,k,l)    
+          
+        l1 = k - (i + stemlength1)
+        l2 = (j - stemlength1 + 1) - (k + stemlength2) 
+        l3 = (l - stemlength2) - j
+
+        looplength = l1 + l2 + l3        
+      
+        entropy = PENALTY*(looplength) + INIT
+        # delG = wS1 + wS2 - delTLooplength
+        pk_energy = stack_s1 + stack_s2 - entropy
+      
+        if pk_energy < 0.0:            
+            pk_dic_longpk_result[pk_stem] = pk_energy #, stack_s1, stack_s2, l1, l2, l3, entropy, looplength
+                
+    return pk_dic_longpk_result

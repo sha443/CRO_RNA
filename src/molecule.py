@@ -11,6 +11,7 @@ class Molecule():
     minPE = []
     minStruct = []
     sequence = ""
+    basePairs = {}
     # Molecule table contains permuated stem info and this is the population
     moleculeTable = None 
     moleculeEnergy= None
@@ -21,7 +22,8 @@ class Molecule():
     def Mol(self,sequence, popSize, initialKE):
         dotplot = population.Checkerboard(sequence)
         infoTable = population.FindDiagonal(sequence,dotplot)
-        self.molecules, self.stemPool, self.infoEnergy, self.moleculeEnergy, self.moleculeTable, self.infoTable = population.GenerateMolecule(sequence,len(sequence),popSize,infoTable)
+
+        self.molecules, self.stemPool, self.infoEnergy, self.moleculeEnergy, self.moleculeTable, self.infoTable,self.basePairs = population.GenerateMolecule(sequence,len(sequence),popSize,infoTable)
         #population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
 
         self.PE = self.moleculeEnergy
