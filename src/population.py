@@ -1,4 +1,6 @@
 import random
+import os
+import pseudoknot as pk
 
 # Cheeck if it makes a valid base pair of RNA
 def IsPair(c1,c2):
@@ -10,6 +12,7 @@ def IsPair(c1,c2):
         return 1
     else:
         return 0
+# end function
 
 # Make dotplot for RNA sequence
 def Checkerboard(sequence):
@@ -30,6 +33,8 @@ def Checkerboard(sequence):
     #        print(board[i][j])
     #   print("\n")
     return board
+# end function
+
 # Finding consecutive 4 or more diagonal 1's in board
 def FindDiagonal(sequence,dotplot):
     info = []
@@ -50,29 +55,32 @@ def FindDiagonal(sequence,dotplot):
                 if(count>3):
                     info.append((j,i,count))  # start, end, length
 
-    # sort info table
+    # sort info table in descending order
     infoTable = sorted(info, key=lambda x: x[2],reverse=True)
-    
     return infoTable
     
 
 # Generates given number of molecules
-def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
+def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
     molecule = []
-    stemPool = []   
+    moleculeShort = []
+    stemPool = {}
     molecule_energy = []
     moleculeTable = []
     basePairs = {}
 
 
-    for t in range(nPopulation):
+    for t in range(popSize):
         flag = []
         flagValid = []
         makePair = []
         infoEnergy = []
-        pool = []
         mol = []
         moleculeSequence = []
+        molShort = {}
+        pool = []
+        scElements = []
+        pkElements = []
 
         # Initialization
         for i in range(sequenceLength):
@@ -83,12 +91,10 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         # Adding paranthesis
         pair = 0
         pairIndex=0
-        stempoolIndex =0
-        stem = 0
 
         # Randomize the infoTable for each time population generation
         # random.shuffle(infoTable)
-        infoTable1 = infoTable
+        infoTable1 = infoTable[:]
         # Molecule sequence generate for CRO operator 
         # problem; duplicate vales 
         for i in range(0,len(infoTable)-1):
@@ -99,10 +105,10 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         random.shuffle(moleculeSequence)
         for i in range(0,len(infoTable)-1):
             infoTable[moleculeSequence[i]] = infoTable1[i]
-        flagStemPool=0
 
 
         # Find for new population
+        index = 0
         for base in infoTable:
             start,end,length = base
             # Initial energy 0
@@ -113,119 +119,161 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
                 if(flag[j]==0 and flag[k]==0):
                     flag[j] = 2
                     flag[k] = 2
-                    flagValid[j] = 1 # )
-                    flagValid[k] = 2 # (
-                    stem+=1
+                    flagValid[j] = 1 # (
+                    flagValid[k] = 2 # )
+                # endif
             # End for j,k
 
-            # Can make at least 3 stems and the inside brackets are enclosed
-            revoke = 0 #Take back all the actions
-            if stem>=3:
-                for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-                    if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-                        flag[j] = 1
-                        flag[k] = 1
-                        mol[j] = "("
-                        mol[k] = ")"
-                        infoEnergy.append((j,k))  # start, end
-                        makePair.append((j,k))
+            # Search for 3 or more bp
+            startPair = None
+            endPair = None
+
+            for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+                # Check if first valid bond is found
+                stem = 0
+                short = 0
+
+                if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
+                    startPair = (j,k)
+                    while(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k) and j<=k):
+                        stem+=1
+                        j+=1
+                        k-=1
+                        # May not needed
+                        endPair = (j,k)
+                    # endwhile
+
+                    # Revoke if not found enough stems
+                    if(stem<3 and stem>0):
+                        f,t = startPair
+                        for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+                            flag[x] = 0
+                            flag[y] = 0
+                            flagValid[x] = 0
+                            flagValid[y] = 0
+                        # endfor
+
+                    # Else add to mol and info
                     else:
-                        revoke = 1
-                        break
-                # End for j,k
+                        f,t = startPair
+                        scElements.append([f,t,stem]) # start,end,length
+                        for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+                            flag[x] = 1
+                            flag[y] = 1
+                            mol[x] = "("
+                            mol[y] = ")"
+                            infoEnergy.append((x,y))  # start, end
+                            makePair.append((x,y))
+                        # endfor
+                        # Save this info as added in molecules
+                        if(stem):   # Unnecessary if statement
+                            molShort[index] =(start, end, stem)
+                            index+=1
+                            short = 0
+                        # endif short
+                    # endif stem
 
-                if(revoke==1):
-                    for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-                        if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-                            flag[j] = 0
-                            flag[k] = 0
-                            flagValid[j] = 0
-                            flagValid[k] = 0
-                    flagStemPool = 1
-            # End if stem>=3
+                # endif
+            # Endfor j,k
+        # Endfor basepair = start, end, length
 
-            else:
-                for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-                    if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-                        flag[j] = 0
-                        flag[k] = 0
-                        flagValid[j] = 0
-                        flagValid[k] = 0
-                flagStemPool = 1
-
-            if(flagStemPool==1):
-                pool.append((start,end,length))
-                flagStemPool =0
-
-        # End start, end, length
-
+        # print(PrintableMolecule(mol))
+        # print(scElements)
         # Finding pseudoknot
-        # mol2 = mol  # make a duplicate of molecule
-        # for i,j,len1 in infoTable:
-        #     for k,l,len2 in pool:
-               
-        #         overlap=0
-        #         overlap2=0
-        #         newBond=0
-                
-        #         if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
-        #             # Pseudoknot info
-        #             # Loop lenght calculation for energy evaluation 
-        #             l1 = k - (i + len1)
-        #             l2 = (j - len1 + 1) - (k + len2)
-        #             l3 = (l - len2) - j
-        #             #print(l1,l2,l3,"pseudoknot")
-        #             pseudoStem=0
-        #             extra=0
-        #             # for(u=k,v=l; u<k+len2; u++,v--)
-        #             for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-        #                 if(overlap>=2):
-        #                     break
-        #                 if(flag[u]==0 and flag[v]==0):
-        #                     flag[u] = 2
-        #                     flag[v] = 2
-        #                     extra+=1
-        #                     pseudoStem+=1
-        #                 elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-        #                     overlap+=1
-        #                     pseudoStem+=1
-        #             # End for u,v
-        #             if(pseudoStem>=2):
-        #                 extra=0
-        #                 for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-        #                     if(overlap2==2):
-        #                         break
-        #                     if (flag[u] == 2 and flag[v] == 2):
-        #                        # print("matched at:",u,v)
-        #                         flag[u] = 3
-        #                         mol2[u] = '['
-        #                         flag[v] = 3
-        #                         mol2[v] = ']'
-        #                         extra+=1
-        #                     elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-        #                         overlap2+=1
-        #                        # print("overlaped at:",u,v)
+        mol2 = mol[:]  # make a duplicate of molecule
+        for i,j,len1 in scElements:
+            for k,l,len2 in infoTable:
+                if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+                    # Pseudoknot info
+                    # Loop lenght calculation for energy evaluation 
+                    l1 = k - (i + len1)
+                    l2 = (j - len1 + 1) - (k + len2)
+                    l3 = (l - len2) - j
+                    if(pk.LoopsFulfill(l1, l2, l3)):
+                        # print(j,k,len2,"pk")
 
-        #                         flag[u] = 3
-        #                         mol2[u] = '['
-        #                         flag[v] = 3
-        #                         mol2[v] = ']'
-        #                         mol2 = RemoveParanthesis(u,v,mol2,makePair)
-        #                     # End if
-        #                 # End for u,v
-        #             # End pseudostem
-        #             else: # Revoke the flag status
-        #                 for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-        #                     if(flag[u] == 2 and flag[v] == 2):
-        #                         flag[u] = 0
-        #                         flag[v] = 0
-        #                     # endif
-        #                 # End for u,v
-        #             #end main loop
-        #         # end pseudo condition
-        #     # end for k,l, l2
-        # # end for i,j,l1
+                        # Search inside for making pk
+                        for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                            if(flag[u]==0 and flag[v]==0):
+                                flag[u] = 2
+                                flag[v] = 2
+                                flagValid[u] = 3 # [
+                                flagValid[v] = 4 # ]
+                            # endif
+                        # endfor
 
+                        # Search for 2 or more bp for making pk
+                        startPk = None
+                        endPk = None
+
+                        for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                            # Checy if first valid bond is found
+                            stem = 0
+                            if(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v)):
+                                startPair = (u,v)
+                                uu = u
+                                vv = v
+                                while(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v) and u<=v):
+                                    
+                                    # Check if it is still valid counting the future stem
+                                    l1 = uu - (i + len1)
+                                    l2 = (j - len1 + 1) - (uu + stem+1)
+                                    l3 = (vv - stem-1) - j
+                                    stillValid = pk.LoopsFulfill(l1, l2, l3)
+                                    if(stillValid):
+                                        stem+=1
+                                        u+=1
+                                        v-=1
+                                        # May not needed
+                                        endPair = (u,v)
+                                    else:
+                                        break
+                                # endwhile
+
+                                
+                                # Revoke if not found enough stems (at least 2)
+                                if(stem<2 and stem>0): # or (not stillValid)
+                                    f,t = startPair
+                                    for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+                                        flag[x] = 0
+                                        flag[y] = 0
+                                        flagValid[x] = 0
+                                        flagValid[y] = 0
+                                    # endfor
+
+                                # add to mol and info
+                                elif(stillValid):
+                                    f,t = startPair
+                                    # print(i,j,f,t,len1,stem,l1,l2,l3)
+                                    pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+                                    for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+                                        flag[x] = 1
+                                        flag[y] = 1
+                                        mol2[x] = "["
+                                        mol2[y] = "]"
+
+                                        # Must be removed later
+                                        infoEnergy.append((x,y))
+                                        makePair.append((x,y))
+                                    # endfor
+                                # endif stem
+
+                            # endif
+                        # Endfor x,y
+                    else:
+                        marker =0 #, l1, l2, l3,len1,len2= pk.Overlap(l1, l2, l3, len1, len2)
+                        if(marker):
+                        # Resolvable overlap
+                            # print(l1,l2,l3,"pk-OL",len1,len2)
+                            pass
+                    
+                # end pseudo condition
+            # end for k,l, l2
+        # end for i,j,l1
+
+        # print(PrintableMolecule(mol2))
+
+        
         # Energy calculation
         flag1 = 0   # Found au/gu penalty
         flag2 = 0   # Check if it is the first input
@@ -300,23 +348,40 @@ def GenerateMolecule(sequence, sequenceLength,nPopulation,infoTable):
         # Endif
         molecule_energy.append(total_energy)
 
+        # Compute stemPool
+        temp = []
+        pool = moleculeSequence
+        for i in pool:
+            fl=0
+            for j in molShort:
+                if(infoTable[i]==j):
+                    fl = 1
+                    break
+                # endif
+            if(fl==0):
+                temp.append(pool[i])
+
+            # Endfor
+        # Endfor
+        stemPool[t] = temp
 
         # Add molecules to the mole
-        molecule.append(mol)
-        stemPool.append(pool)
-        moleculeTable.append(moleculeSequence)
-        # moleculeTable.append(infoTable)
+        if(mol==mol2):
+            # print("No Pseudoknot detected!")
+            pass
+        else:
+            molecule.append(mol2)
 
-    
+        moleculeShort.append(molShort)
+        moleculeTable.append(moleculeSequence)
+        
         # Clear all    
         flagValid.clear()
         flag.clear()
 
-        # no need to clear these, because defined in loop
-        #pool.clear()
-        #mol.clear()
+    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,basePairs,infoTable,moleculeShort
+# end function
 
-    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,infoTable,basePairs
 def RemoveParanthesis(u,v,mol2,makePair):
     for j,k in makePair:
         if(u==j):
@@ -328,75 +393,17 @@ def RemoveParanthesis(u,v,mol2,makePair):
         elif(v==k):
             mol2[j] = "."
     return mol2
-def Overlap(molecule,stemPool):
-
-    # Finding pseudoknot
-    mole2 = molecule  # make a duplicate of molecule
-    for i,j,len1 in infoTable:
-        for k,l,len2 in stemPool:
-            overlap=0
-            overlap2=0
-            newBond=0
-            
-            if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
-                pseudoStem=0
-                extra=0
-                # for(u=k,v=l; u<k+len2; u++,v--)
-                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-                    if(overlap>=2):
-                        break
-                    if(flag[u]==0 and flag[v]==0):
-                        flag[u] = 2
-                        flag[v] = 2
-                        extra+=1
-                        pseudoStem+=1
-                    elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-                        overlap+=1
-                        pseudoStem+=1
-                # End for u,v
-                if(pseudoStem>1):
-                    extra=0
-                    for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-                        if(overlap2==2):
-                            break
-                        if (flag[u] == 2 and flag[v] == 2):
-                            #echo "matched at:".$u." ".$v."<br>";
-                            flag[u] = 3
-                            mol2[u] = '['
-                            flag[v] = 3
-                            mol2[v] = ']'
-                            ++extra
-                        elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-                            ++overlap2
-                            #echo "overlaped at:".$u." ".$v."<br>";
-
-                            flag[u] = 3
-                            mol2[u] = '['
-                            flag[v] = 3
-                            mol2[v] = ']'
-                            mol2 = RemoveParanthesis(u,v,mol2,pair);
-                        # End if
-                    # End for u,v
-                # End pseudostem
-                else: # Revoke the flag status
-                    for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-                        if(flag[u] == 2 and flag[v] == 2):
-                            flag[u] = 0
-                            flag[v] = 0
-                        # endif
-                    # End for u,v
-                #end main loop
-            # end pseudo condition
-        # end for k,l, l2
-    # end for i,j,l1
-
+# end function
 
 def Equal12(flagValid,j,k):
-
     one=0
     two=0
     if(j>k):   
-        swap(j,k)
+        #swap(j,k)
+        t = j
+        j = k
+        k = t
+
     for i in range(j,k+1):
         if(flagValid[i]==1):
             one+=1
@@ -407,7 +414,28 @@ def Equal12(flagValid,j,k):
         return True
     else:
         return False
+# end function
+
+def Equal34(flagValid,j,k):
+    three=0
+    four=0
+    if(j>k):   
+        #swap(j,k)
+        t = j
+        j = k
+        k = t
+
+    for i in range(j,k+1):
+        if(flagValid[i]==3):
+            three+=1
+        elif (flagValid[i]==4):
+            four+=1
     
+    if(three==four):
+        return True
+    else:
+        return False
+# end function
 # Calclates the Gibbs free energy of a molecule on INN-HB model
 def CalculateEnergy(p1, p2, p3, p4):
         
@@ -518,7 +546,9 @@ def CalculateEnergy(p1, p2, p3, p4):
         return ene
     
     return ene
-        
+    
+# end function
+
 # Generates an array of given size and return them with shuffling
 def SequenceGenerator(size):
 
@@ -527,27 +557,11 @@ def SequenceGenerator(size):
         numbers.append(i)
     random.shuffle(numbers)
     return numbers
-
-def PrintInfo(molecule,stemPool,infoEnergy, moleculeEnergy):
-    file = open("..\data\output.txt","w+")
-    # print("Stempool")
-    # for pools in stemPool:
-    #     for start,end,length in pools:
-    #        print(start,end,length)
-    #     print("\n")
-
-    print("Molecule")
-    index=0
-    for mol in molecule:
-        for i in range(len(mol)):
-            print(mol[i],end="")
-            file.write(mol[i])
-        file.write("\t"+str(moleculeEnergy[index]))
-        index+=1
-        file.write("\n")
-        print("\n")
-
-    # print("infoEnergy")
-    # for j,k in infoEnergy:
-    #     print(j,k)
-    # print("\n")
+# end function
+def PrintableMolecule(molecule):
+    moleculeStr = ""
+    for i in molecule:
+        moleculeStr+=i
+    # endfor
+    return moleculeStr
+# end function

@@ -1,7 +1,7 @@
 import random
-import pseudoknot
 from operators import Operators
 from molecule import Molecule
+import population
 class CRO():
 
 	# Variables
@@ -21,69 +21,192 @@ class CRO():
 	alpha = 0
 	beta = 0
 	sequence = ''
-	mol = None
+	mole = None
 
 
 	######################################################################
 	# CRO Init
 	######################################################################
-	def Init(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, molecule):
+	def Init(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole):
 		self.popSize = popSize
 		self.KELossRate = KELossRate
 		self.MoleColl = MoleColl
 		self.InitialKE = InitialKE
 		self.alpha = alpha
 		self.beta = beta
-		self.buffer = buffer
+		self.self.buffer = self.buffer
 		self.sequence = sequence
-		self.mol = molecule
+		self.mole = mole
+	# end function
 
 	######################################################################
 	# OnWall Ineffective Colision handler
 	######################################################################
-	def OnwallIneffectiveCollision(self,mol,oldMol, index):
+	def OnwallIneffectiveCollision(self,mole,oldMol, index):
 		operator = Operators()
 		newMol = operator.OnWall(oldMol)
 		PEnew = CRO().CalculatePE(newMol)
 		KEnew = 0.0
-		mol.numHit[index] = mol.numHit[index] + 1
-		t = mol.PE1[index] + mol.KE1[index]
+		mole.numHit[index] = mole.numHit[index] + 1
+		t = mole.PE1[index] + mole.KE1[index]
 		if (t>=PEnew):
 			a = (random.uniform(0,1) * (1-self.KELossRate))+self.KELossRate
-			KEnew = (mol.PE1[index] - PEnew + mol.KE1[index])*a
-			mol.moleculeTable[index] = newMol
-			mol.PE1[index] = PEnew
-			mol.KE1[index] = KEnew
-			if(mol.PE1[index]<mol.minPE[index]):
-			    mol.minStruct[index] = mol
-			    mol.minPE[index] = mol.PE1[index]
-			    mol.minHit[index] = mol.numHit[index]
+			KEnew = (mole.PE1[index] - PEnew + mole.KE1[index])*a
+			mole.moleculeTable[index] = newMol
+			mole.PE1[index] = PEnew
+			mole.KE1[index] = KEnew
+			if(mole.PE1[index]<mole.minPE[index]):
+			    mole.minStruct[index] = mole
+			    mole.minPE[index] = mole.PE1[index]
+			    mole.minHit[index] = mole.numHit[index]
 			#endif
 		#endif
-	#end
+	#end function
+
+	######################################################################
+	# Decomposition handler
+	######################################################################
+	def Decomposition(self,mole,oldMol,index):
+		operator = Operators()
+		newMol1, newMol2 = operator.Decomposition(oldMol)
+		pe1 = CRO().CalculatePE(newMol1)
+		pe2 = CRO().CalculatePE(newMol2)
+
+		e_dec = 0
+		gamma1 = 0
+		gamma2 = 0
+		gamma3 = 0
+		gamma1 = random.uniform(0,1)
+		gamma2 = random.uniform(0,1)
+
+		if ((mole.PE1[index] + mole.KE1[index]) >= (pe1+pe2)):
+			e_dec = (mole.PE1[index] + mole.KE1[index]) - (pe1 + pe2)
+		else:
+		   e_dec = (mole.PE1[index] + mole.KE1[index]) + gamma1 * gamma2 * self.buffer - (pe1 + pe2)
+		# endif
+
+		if (e_dec>=0):
+		   self.buffer = self.buffer * (1 -( gamma1*gamma2))
+		   gamma3 = random.uniform(0,1)
+
+		   mole.moleculeTable[index] = newMol1
+		   mole.PE1[index] = pe1
+		   mole.KE1[index] = e_dec * gamma3
+		   mole.numHit[index] = 0
+		   mole.minHit[index] = 0
+		   mole.minStruct[index] = newMol1
+		   mole.minPE[index] = pe1
+
+		   mole.moleculeTable.append(newMol1)
+		   mole.PE1.append(pe1)
+		   mole.KE1.append(e_dec * gamma3)
+		   mole.numHit.append(0)
+		   mole.minHit.append(0)
+		   mole.minStruct.append(newMol1)
+		   mole.minPE.append(pe1)
+
+		else:
+		   mole.numHit[index] = mole.numHit[index] + 1
+		# endif
+	# end function
+
+	######################################################################
+	# IntermolecularIneffectiveCollision handler
+	######################################################################
+	def IntermolecularIneffectiveCollision(self,mole,oldMol1,oldMol2,index1,index2):
+		operator = Operators()
+		newMol1, newMol2 = operator.Intermolecular(oldMol1, oldMol2)
+		pe1 = CRO().CalculatePE(newMol1)
+		pe2 = CRO().CalculatePE(newMol2)
+		
+		e_inter = 0
+		gamma4 = random.uniform(0,1)
+
+		mole.numHit[index1] = mole.numHit[index1] + 1
+		mole.numHit[index2] = mole.numHit[index2] + 1
+		e_inter = (mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - (pe1 + pe2)
+		if (e_inter>=0):
+		    mole.moleculeTable[index1] = newMol1
+		    mole.moleculeTable[index2] = newMol2
+		    mole.PE1[index1] = pe1
+		    mole.PE1[index2] = pe2
+		    mole.KE1[index1] = e_inter * gamma4
+		    mole.KE1[index2] = e_inter * (1 - gamma4)
+
+		    if (mole.PE1[index1]<mole.minPE[index1]):
+		        mole.minStruct[index1] = mole.moleculeTable[index1]
+		        mole.minPE[index1] = mole.PE1[index1]
+		        mole.minHit[index1] = mole.numHit[index1]
+		    # endif
+
+		    if (mole.PE1[index2]<mole.minPE[index2]):
+		        mole.minStruct[index2] = mole.moleculeTable[index2]
+		        mole.minPE[index2] = mole.PE1[index2]
+		        mole.minHit[index2] = mole.numHit[index2]
+		    # endif
+		# endif
+	# end function
+
+	def Synthesis (self,mole,oldMol1,oldMol2,index1,index2):
+		operator = Operators()
+		newMol = operator.Synthesis(oldMol1, oldMol2)
+		pe_new = CRO().CalculatePE(newMol)
+
+		if((mole.PE1[index1]+mole.PE1[index2] + mole.KE1[index1]+mole.KE1[index2])>=pe_new):
+		    del mole.moleculeTable[index1]
+		    del mole.PE1[index1]
+		    del mole.KE1[index1]
+		    del mole.numHit[index1]
+		    del mole.minHit[index1]
+		    del mole.minStruct[index1]
+		    del mole.minPE[index1]
+
+		    del mole.moleculeTable[index2]
+		    del mole.PE1[index2]
+		    del mole.KE1[index2]
+		    del mole.numHit[index2]
+		    del mole.minHit[index2]
+		    del mole.minStruct[index2]
+		    del mole.minPE[index2]
+
+		    mole.moleculeTable.append(newMol)
+		    mole.PE1.append(pe_new)
+		    mole.KE1.append((mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - pe_new)
+		    mole.numHit.append(0)
+		    mole.minHit.append(0)
+		    mole.minStruct.append(newMol)
+		    mole.minPE.append(pe_new)
+		else:
+		    mole.numHit[index1] = mole.numHit[index1] + 1
+		    mole.numHit[index1] = mole.numHit[index1] + 1
+		# endif
+	# end function
 
 	######################################################################
 	# Main CRO handler
 	######################################################################
-	def CRO(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mol,iteration,fileName):
+	def CRO(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration, path,fileName):
 		b = 0
 		i = 0
 		w = None
-		w1 = None
-		w2 = None
+		oldMol1 = None
+		oldMol2 = None
 		index, index1, index2 = None,None,None
 		minEnrg = 1000
-		tt=0
+		sl=0
 
-		for j in range(len(mol.PE)):
-		    if (mol.PE1[j] < minEnrg):
-		        minEnrg = mol.PE1[j]
-		        tt = j
+		for j in range(len(mole.PE)):
+		    if (mole.PE1[j] < minEnrg):
+		        minEnrg = mole.PE1[j]
+		        sl = j+1
 		    #endif
 		#endfor
-		energyBefore = open("..\data\energy_before_"+fileName+".txt","w+")
-		energyBefore.write(str(minEnrg))
-		energyBefore.write(str(tt))
+
+		# Energy save
+		energyBefore = open(path+"initial_population_"+fileName,"a")
+		energyBefore.write("Minimum energy: "+str(minEnrg))
+		energyBefore.write(" at position: "+str(sl))
+		energyBefore.write("\n======================================================\n")
 
 		# Oprators hit counter
 		on = 0
@@ -97,45 +220,83 @@ class CRO():
 			b = random.uniform(0,1)
 			# Decomposition or OnwallIneffectiveCollision
 			if (b>MoleColl):
-				index = random.randint(0, len(mol.PE1)-1)
+				index = random.randint(0, len(mole.PE1)-1)
 
-				if ((mol.numHit[index]-mol.minHit[index])>alpha):
-					++dec
-					#Decomposition(mol.moleculeTable[index], index)
+				if ((mole.numHit[index]-mole.minHit[index])>alpha):
+					dec+=1
+					CRO().Decomposition(mole,mole.moleculeTable[index], index)
 	            #endif
 				else:
-					++on
-					CRO().OnwallIneffectiveCollision(mol,mol.moleculeTable[index], index)
+					on+=1
+					CRO().OnwallIneffectiveCollision(mole,mole.moleculeTable[index], index)
 	            #end else
 	        #endif
 
 	        # Synthesis or IntermolecularIneffectiveCollision
 			else:
-				index1 = random.randint(0, len(mol.PE1)-1)
-				index2 = random.randint(0, len(mol.PE1)-1)
-				if ((mol.KE1[index1]+mol.KE1[index2])<beta):
-				    ++syn
-				    #CRO().Synthesis(mol.moleculeTable[index1], mol.moleculeTable[index2], index1, index2)
+				index1 = random.randint(0, len(mole.PE1)-1)
+				index2 = random.randint(0, len(mole.PE1)-1)
+				if ((mole.KE1[index1]+mole.KE1[index2])<beta):
+				    syn+=1
+				    CRO().Synthesis(mole,mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
 				#endif
 				else:
-				    ++inef
-				    #IntermolecularIneffectiveCollision(mol.moleculeTable[index1], mol.moleculeTable[index2], index1, index2)
+				    inef+=1
+				    CRO().IntermolecularIneffectiveCollision(mole, mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
 				#endelse
 			#end else
+		# Endfor iteration
+		
+		# Finding minimum energy
+		minEnrg = 1000
+		mole.PE1 = mole.PE1
+		minEnrgIndex = None
 
-			# Finding minimum energy
-			minEnrg = 1000
-			mol.PE1 = mol.PE1
-			minEnrgIndex = None
+		for j in range(len(mole.PE)):
+		    if (mole.PE1[j]<minEnrg):
+		        minEnrg = mole.PE1[j]
+		        minEnrgIndex = j
+		    #endif
+		#endfor
+		hits = "onwall= "+str(on) +" Dec = "+str(dec)+" Syn = "+str(syn)+" Intermolecular = "+str(inef)
+		print(hits)
+		# Energy save
+		energyAfter = open(path+"final_population_"+fileName,"a")
+		energyAfter.write(hits)
+		energyAfter.write("\n======================================================\n")
 
-			for j in range(len(mol.PE)):
-			    if (mol.PE1[j]<minEnrg):
-			        minEnrg = mol.PE1[j]
-			        minEnrgIndex = j
-			    #endif
-			#endfor
-		#end for i
-	#end cro
+		CRO().FindMinimumStructure(mole,minEnrg,minEnrgIndex)
+	#end function
+
+	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex):		
+		flag = []
+		mol = []
+		# Initialization
+		for i in range(len(mole.sequence)):
+		    flag.append(0)
+		    mol.append(".")
+		# endfor
+
+		# Construction of secondary structure
+		# in final version it will be shortenedInfotable
+		for i in mole.moleculeTable[minEnrgIndex]:
+			base = mole.infoTable[i]
+			start,end,length = base
+
+			# Search inside for making bond
+			for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+			    if(flag[j]==0 and flag[k]==0):
+			        flag[j] = 1
+			        flag[k] = 1
+			        mol[j] = "("
+			        mol[k] = ")"
+			    # endif
+			# End for j,k
+		# Endfor basepair = start, end, length
+
+		# To be continue :-P
+		
+	# end function
 	def IsPair(c1,c2):
 	    if((c1=="A" and c2=="U") or (c1=="U" and c2=="A")):
 	        return 1
@@ -145,7 +306,7 @@ class CRO():
 	        return 1
 	    else:
 	        return 0
-    #end
+    #end function
 	def Checkerboard(self,sequence):
 		board = []
 		for i in range(len(sequence)-1):
@@ -159,7 +320,8 @@ class CRO():
 		        else:
 		            board[i].append(0)
 		return board
-	#End
+	#End function
+
 	def FindDiagonal(self,size,dotplot):
 		info = []
 		infoTable = []
@@ -181,7 +343,8 @@ class CRO():
 		# sort info table
 		infoTable = sorted(info, key=lambda x: x[2],reverse=True)
 		return infoTable
-	#End
+	#End function
+
 	def CalculatePE(self,w):
 		molecule = []
 		stemPool = []   
@@ -427,7 +590,6 @@ class CRO():
 		stemPool.append(pool)
 		moleculeTable.append(moleculeSequence)
 
-
 		# Clear all    
 		flagValid.clear()
 		flag.clear()
@@ -547,52 +709,5 @@ class CRO():
 		return ene
 	#End
 
-	def Performance(predicted):
-		code = None
-		code = open("../data/ref.txt","r").read()
-		true_basepair = 0
-		a = 0
-		c = 0
-		false_negative_basepair = 0
-		false_positive_basepair = 0
-		for i in range(len(predicted)):
-
-		    if ((predicted[i] == '(' or predicted[i] == '[' or predicted[i] == '') and (code[i] == '(' or code[i] == '[' or code[i] == '')):
-		    
-		        true_basepair+=1
-		    
-		    if ((predicted[i] != '(' or predicted[i] != '[' or predicted[i] != '') and (code[i] == '(' or code[i] == '[' or code[i] == '')):
-		    
-		        false_negative_basepair+=1
-		    
-		    if ((predicted[i]=='(' or predicted[i]=='[' or predicted[i]=='') and (code[i] !='(' or code[i] !='[' or code[i] !='')):
-		    
-		        false_positive_basepair+=1
-
-		sensitivity =( true_basepair/ (true_basepair + false_negative_basepair))*100.0
-		specificity =( true_basepair / (true_basepair + false_positive_basepair))*100.0
-		a, c
-		a = sensitivity * specificity * 2
-		c = sensitivity + specificity
-		f_measure = 0 #= a / c
-
-		return sensitivity,specificity,f_measure
-    #End
-
-
-
-# index=0
-# for m in mol.molecules:
-# 	sen,sp,f = CRO.Performance(m)
-	# print(sen)
-	# print(sp)
-	# print(f)
-	# for i in range(len(m)):
-	#     print(m[i],end="")
-	# index+=1
-	# print("\n")
-# index=0
-# for m in mol.minPE:
-#         #print(m,end="")
-#         index+=1
-#        # print("\n")
+	
+# End class

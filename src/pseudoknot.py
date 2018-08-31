@@ -21,12 +21,17 @@ def LoopsFulfill(l1, l2, l3):
     return loops_fulfilled
 # end function
 
-def BuildPseudoknots(stemList):
+def BuildPseudoknots(moleculeShort,stemPool,infoTable):
+    # Manipulate moleculeShort, stemPool
+
 
     pkList = []
     stems_shortened = {}
-    for i,j, stemlength1 in stemList:
-        for k,l, stemlength2 in stemList:
+    for x in moleculeShort:
+        i,j, stemlength1 = moleculeShort[x]
+        for y in stemPool:
+            k,l, stemlength2 = infoTable[y]
+
             #i, j = S1
             #k, l = S2
 

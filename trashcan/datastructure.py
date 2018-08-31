@@ -11,6 +11,7 @@ moleculeTable = [1,2,3,4,5,6,7,..., n]
 infoEnergy = [(i,j)]
 stemPool = [(i,j,length)] = [(27, 111, 5)]
 molecules = [[.,(,),.]]
+moleculeShort = list of dict = [{(start,end,length):(shortend_length)}] = [{(18, 30, 5): 5, (1, 36, 6): 6},]
 infoTable = [(i,j,length)] = [(86, 116, 10)]
 
 
