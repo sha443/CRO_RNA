@@ -14,10 +14,10 @@ class main():
 		sequence = file.readline()
 		# Parameters
 		iteration = 1
-		popSize = 30
+		popSize = 10
 		KELossRate= 0.8
 		MoleColl= 0.5
-		InitialKE= 1
+		InitialKE= 0
 		alpha = 1
 		beta = 5
 		buffer =0
@@ -46,7 +46,6 @@ class main():
 		# endfor
 		# initPop.write("\n")
 
-
 		# Initial Comparison
 		benchmark = open("../data/benchmark/"+filename,"r").read()
 		predicted = population.PrintableMolecule(mole.molecules[minIndex])
@@ -55,7 +54,8 @@ class main():
 		print("(sp, sen, f, tp, fp, fn)")
 		# sensitivity,specificity,f_measure,true_basepair,false_positive_basepair,false_negative_basepair
 		print(func.Performance(predicted,benchmark))
-
+		print(mole.pkElements[minIndex])
+		
 		#----------------------------------------------------------------------------------------------
 		# Initial INN-HB energy calculation
 		#----------------------------------------------------------------------------------------------

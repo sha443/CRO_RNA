@@ -67,10 +67,11 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
     stemPool = {}
     molecule_energy = []
     moleculeTable = []
+    elements = []
     basePairs = {}
+    test = 0
 
-
-    for t in range(popSize):
+    while(test<popSize):
         flag = []
         flagValid = []
         makePair = []
@@ -346,7 +347,6 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                 #Endif
             #Endif
         # Endif
-        molecule_energy.append(total_energy)
 
         # Compute stemPool
         temp = []
@@ -366,20 +366,26 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         stemPool[t] = temp
 
         # Add molecules to the mole
+        # Caution: This may lead to infinite loop sometime if the structure contains no pseudoknot
         if(mol==mol2):
             # print("No Pseudoknot detected!")
-            pass
+            continue
         else:
             molecule.append(mol2)
+            moleculeShort.append(molShort)
+            moleculeTable.append(moleculeSequence)
+            elements.append([scElements,pkElements])
+            molecule_energy.append(total_energy)
 
-        moleculeShort.append(molShort)
-        moleculeTable.append(moleculeSequence)
-        
+            test+=1
+        # endif
+
         # Clear all    
         flagValid.clear()
         flag.clear()
+    # endfor t=popSize
 
-    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,basePairs,infoTable,moleculeShort
+    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,basePairs,infoTable,moleculeShort,scElements,elements
 # end function
 
 def RemoveParanthesis(u,v,mol2,makePair):

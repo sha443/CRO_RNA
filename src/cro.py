@@ -221,7 +221,6 @@ class CRO():
 			# Decomposition or OnwallIneffectiveCollision
 			if (b>MoleColl):
 				index = random.randint(0, len(mole.PE1)-1)
-
 				if ((mole.numHit[index]-mole.minHit[index])>alpha):
 					dec+=1
 					CRO().Decomposition(mole,mole.moleculeTable[index], index)
