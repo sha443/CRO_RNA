@@ -1,10 +1,13 @@
 import random
 from operators import Operators
 from molecule import Molecule
+import pseudoknot as pk
 import population
+from function import Function as func
 class CRO():
 
 	# Variables
+	structureFound = ""
 	sensitivity = 0
 	specificity = 0
 	f_measure = 0
@@ -27,17 +30,17 @@ class CRO():
 	######################################################################
 	# CRO Init
 	######################################################################
-	def Init(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole):
-		self.popSize = popSize
-		self.KELossRate = KELossRate
-		self.MoleColl = MoleColl
-		self.InitialKE = InitialKE
-		self.alpha = alpha
-		self.beta = beta
-		self.self.buffer = self.buffer
-		self.sequence = sequence
-		self.mole = mole
-	# end function
+	# def Init(self,popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole):
+	# 	self.popSize = popSize
+	# 	self.KELossRate = KELossRate
+	# 	self.MoleColl = MoleColl
+	# 	self.InitialKE = InitialKE
+	# 	self.alpha = alpha
+	# 	self.beta = beta
+	# 	self.self.buffer = self.buffer
+	# 	self.sequence = sequence
+	# 	self.mole = mole
+	# # end function
 
 	######################################################################
 	# OnWall Ineffective Colision handler
@@ -45,7 +48,7 @@ class CRO():
 	def OnwallIneffectiveCollision(self,mole,oldMol, index):
 		operator = Operators()
 		newMol = operator.OnWall(oldMol)
-		PEnew = CRO().CalculatePE(newMol)
+		PEnew = CRO().CalculatePE(mole,newMol)
 		KEnew = 0.0
 		mole.numHit[index] = mole.numHit[index] + 1
 		t = mole.PE1[index] + mole.KE1[index]
@@ -56,9 +59,9 @@ class CRO():
 			mole.PE1[index] = PEnew
 			mole.KE1[index] = KEnew
 			if(mole.PE1[index]<mole.minPE[index]):
-			    mole.minStruct[index] = mole
-			    mole.minPE[index] = mole.PE1[index]
-			    mole.minHit[index] = mole.numHit[index]
+				mole.minStruct[index] = mole
+				mole.minPE[index] = mole.PE1[index]
+				mole.minHit[index] = mole.numHit[index]
 			#endif
 		#endif
 	#end function
@@ -69,8 +72,8 @@ class CRO():
 	def Decomposition(self,mole,oldMol,index):
 		operator = Operators()
 		newMol1, newMol2 = operator.Decomposition(oldMol)
-		pe1 = CRO().CalculatePE(newMol1)
-		pe2 = CRO().CalculatePE(newMol2)
+		pe1 = CRO().CalculatePE(mole,newMol1)
+		pe2 = CRO().CalculatePE(mole,newMol2)
 
 		e_dec = 0
 		gamma1 = 0
@@ -116,8 +119,8 @@ class CRO():
 	def IntermolecularIneffectiveCollision(self,mole,oldMol1,oldMol2,index1,index2):
 		operator = Operators()
 		newMol1, newMol2 = operator.Intermolecular(oldMol1, oldMol2)
-		pe1 = CRO().CalculatePE(newMol1)
-		pe2 = CRO().CalculatePE(newMol2)
+		pe1 = CRO().CalculatePE(mole,newMol1)
+		pe2 = CRO().CalculatePE(mole,newMol2)
 		
 		e_inter = 0
 		gamma4 = random.uniform(0,1)
@@ -126,59 +129,59 @@ class CRO():
 		mole.numHit[index2] = mole.numHit[index2] + 1
 		e_inter = (mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - (pe1 + pe2)
 		if (e_inter>=0):
-		    mole.moleculeTable[index1] = newMol1
-		    mole.moleculeTable[index2] = newMol2
-		    mole.PE1[index1] = pe1
-		    mole.PE1[index2] = pe2
-		    mole.KE1[index1] = e_inter * gamma4
-		    mole.KE1[index2] = e_inter * (1 - gamma4)
+			mole.moleculeTable[index1] = newMol1
+			mole.moleculeTable[index2] = newMol2
+			mole.PE1[index1] = pe1
+			mole.PE1[index2] = pe2
+			mole.KE1[index1] = e_inter * gamma4
+			mole.KE1[index2] = e_inter * (1 - gamma4)
 
-		    if (mole.PE1[index1]<mole.minPE[index1]):
-		        mole.minStruct[index1] = mole.moleculeTable[index1]
-		        mole.minPE[index1] = mole.PE1[index1]
-		        mole.minHit[index1] = mole.numHit[index1]
-		    # endif
+			if (mole.PE1[index1]<mole.minPE[index1]):
+				mole.minStruct[index1] = mole.moleculeTable[index1]
+				mole.minPE[index1] = mole.PE1[index1]
+				mole.minHit[index1] = mole.numHit[index1]
+			# endif
 
-		    if (mole.PE1[index2]<mole.minPE[index2]):
-		        mole.minStruct[index2] = mole.moleculeTable[index2]
-		        mole.minPE[index2] = mole.PE1[index2]
-		        mole.minHit[index2] = mole.numHit[index2]
-		    # endif
+			if (mole.PE1[index2]<mole.minPE[index2]):
+				mole.minStruct[index2] = mole.moleculeTable[index2]
+				mole.minPE[index2] = mole.PE1[index2]
+				mole.minHit[index2] = mole.numHit[index2]
+			# endif
 		# endif
 	# end function
 
 	def Synthesis (self,mole,oldMol1,oldMol2,index1,index2):
 		operator = Operators()
 		newMol = operator.Synthesis(oldMol1, oldMol2)
-		pe_new = CRO().CalculatePE(newMol)
+		pe_new = CRO().CalculatePE(mole,newMol)
 
 		if((mole.PE1[index1]+mole.PE1[index2] + mole.KE1[index1]+mole.KE1[index2])>=pe_new):
-		    del mole.moleculeTable[index1]
-		    del mole.PE1[index1]
-		    del mole.KE1[index1]
-		    del mole.numHit[index1]
-		    del mole.minHit[index1]
-		    del mole.minStruct[index1]
-		    del mole.minPE[index1]
+			del mole.moleculeTable[index1]
+			del mole.PE1[index1]
+			del mole.KE1[index1]
+			del mole.numHit[index1]
+			del mole.minHit[index1]
+			del mole.minStruct[index1]
+			del mole.minPE[index1]
 
-		    del mole.moleculeTable[index2]
-		    del mole.PE1[index2]
-		    del mole.KE1[index2]
-		    del mole.numHit[index2]
-		    del mole.minHit[index2]
-		    del mole.minStruct[index2]
-		    del mole.minPE[index2]
+			del mole.moleculeTable[index2]
+			del mole.PE1[index2]
+			del mole.KE1[index2]
+			del mole.numHit[index2]
+			del mole.minHit[index2]
+			del mole.minStruct[index2]
+			del mole.minPE[index2]
 
-		    mole.moleculeTable.append(newMol)
-		    mole.PE1.append(pe_new)
-		    mole.KE1.append((mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - pe_new)
-		    mole.numHit.append(0)
-		    mole.minHit.append(0)
-		    mole.minStruct.append(newMol)
-		    mole.minPE.append(pe_new)
+			mole.moleculeTable.append(newMol)
+			mole.PE1.append(pe_new)
+			mole.KE1.append((mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - pe_new)
+			mole.numHit.append(0)
+			mole.minHit.append(0)
+			mole.minStruct.append(newMol)
+			mole.minPE.append(pe_new)
 		else:
-		    mole.numHit[index1] = mole.numHit[index1] + 1
-		    mole.numHit[index1] = mole.numHit[index1] + 1
+			mole.numHit[index1] = mole.numHit[index1] + 1
+			mole.numHit[index1] = mole.numHit[index1] + 1
 		# endif
 	# end function
 
@@ -196,10 +199,10 @@ class CRO():
 		sl=0
 
 		for j in range(len(mole.PE)):
-		    if (mole.PE1[j] < minEnrg):
-		        minEnrg = mole.PE1[j]
-		        sl = j+1
-		    #endif
+			if (mole.PE1[j] < minEnrg):
+				minEnrg = mole.PE1[j]
+				sl = j+1
+			#endif
 		#endfor
 
 		# Energy save
@@ -224,24 +227,24 @@ class CRO():
 				if ((mole.numHit[index]-mole.minHit[index])>alpha):
 					dec+=1
 					CRO().Decomposition(mole,mole.moleculeTable[index], index)
-	            #endif
+				#endif
 				else:
 					on+=1
 					CRO().OnwallIneffectiveCollision(mole,mole.moleculeTable[index], index)
-	            #end else
-	        #endif
+				#end else
+			#endif
 
-	        # Synthesis or IntermolecularIneffectiveCollision
+			# Synthesis or IntermolecularIneffectiveCollision
 			else:
 				index1 = random.randint(0, len(mole.PE1)-1)
 				index2 = random.randint(0, len(mole.PE1)-1)
 				if ((mole.KE1[index1]+mole.KE1[index2])<beta):
-				    syn+=1
-				    CRO().Synthesis(mole,mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
+					syn+=1
+					CRO().Synthesis(mole,mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
 				#endif
 				else:
-				    inef+=1
-				    CRO().IntermolecularIneffectiveCollision(mole, mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
+					inef+=1
+					CRO().IntermolecularIneffectiveCollision(mole, mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
 				#endelse
 			#end else
 		# Endfor iteration
@@ -251,11 +254,12 @@ class CRO():
 		mole.PE1 = mole.PE1
 		minEnrgIndex = None
 
+
 		for j in range(len(mole.PE)):
-		    if (mole.PE1[j]<minEnrg):
-		        minEnrg = mole.PE1[j]
-		        minEnrgIndex = j
-		    #endif
+			if (mole.PE1[j]<minEnrg):
+				minEnrg = mole.PE1[j]
+				minEnrgIndex = j
+			#endif
 		#endfor
 		hits = "onwall= "+str(on) +" Dec = "+str(dec)+" Syn = "+str(syn)+" Intermolecular = "+str(inef)
 		print(hits)
@@ -270,54 +274,212 @@ class CRO():
 	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex):		
 		flag = []
 		mol = []
+		flagValid = []
+		infoEnergy = []
+		moleculeSequence = []
+		scElements = []
+		pkElements = []
 		# Initialization
 		for i in range(len(mole.sequence)):
-		    flag.append(0)
-		    mol.append(".")
+			flag.append(0)
+			mol.append(".")
+			flagValid.append(0)
 		# endfor
 
-		# Construction of secondary structure
-		# in final version it will be shortenedInfotable
+		tempInfo = []
+		# Retrive info and sort according to the length
 		for i in mole.moleculeTable[minEnrgIndex]:
-			base = mole.infoTable[i]
+			tempInfo.append(mole.infoTable[i])
+		# endfor
+		# sort
+		tempInfo = sorted(tempInfo, key=lambda x: x[2],reverse=True)
+		# print(tempInfo)
+
+		# Construction of secondary structure
+		for base in tempInfo:
 			start,end,length = base
 
 			# Search inside for making bond
 			for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-			    if(flag[j]==0 and flag[k]==0):
-			        flag[j] = 1
-			        flag[k] = 1
-			        mol[j] = "("
-			        mol[k] = ")"
-			    # endif
+				if(flag[j]==0 and flag[k]==0):
+					flag[j] = 2
+					flag[k] = 2
+					flagValid[j] = 1 # (
+					flagValid[k] = 2 # )
+				# endif
 			# End for j,k
-		# Endfor basepair = start, end, length
 
-		# To be continue :-P
+			# Search for 3 or more bp
+			startPair = None
+			endPair = None
+
+			for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+				# Check if first valid bond is found
+				stem = 0
+				short = 0
+
+				if(flag[j]==2 and flag[k]==2 and CRO().Equal12(flagValid,j,k)):
+					startPair = (j,k)
+					while(flag[j]==2 and flag[k]==2 and CRO().Equal12(flagValid,j,k) and j<=k):
+						stem+=1
+						j+=1
+						k-=1
+						# May not needed
+						endPair = (j,k)
+					# endwhile
+
+					# Revoke if not found enough stems
+					if(stem<3 and stem>0):
+						f,t = startPair
+						for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+							flag[x] = 0
+							flag[y] = 0
+							flagValid[x] = 0
+							flagValid[y] = 0
+						# endfor
+
+					# Else add to mol and info
+					else:
+						f,t = startPair
+						scElements.append([f,t,stem]) # start,end,length
+						for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+							flag[x] = 1
+							flag[y] = 1
+							mol[x] = "("
+							mol[y] = ")"
+							infoEnergy.append((x,y))  # start, end
+						# endfor
+
+					# endif stem
+
+				# endif
+			# Endfor j,k
+		# Endfor basepair = start, end, length
+		# print(scElements)
+		# print(population.PrintableMolecule(mol))
+		# print(scElements)
+		# Finding pseudoknot
+		mol2 = mol[:]  # make a duplicate of molecule
+		for i,j,len1 in tempInfo:
+			for base in tempInfo:
+				k,l,len2 = base
+
+				if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+
+					# Pseudoknot info
+					# Loop lenght calculation for energy evaluation
+					l1 = k - (i + len1)
+					l2 = (j - len1 + 1) - (k + len2)
+					l3 = (l - len2) - j
+					if(pk.LoopsFulfill(l1, l2, l3)):
+
+						# Search inside for making pk
+						for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+							if(flag[u]==0 and flag[v]==0):
+								flag[u] = 2
+								flag[v] = 2
+								flagValid[u] = 3 # [
+								flagValid[v] = 4 # ]
+							# endif
+						# endfor
+
+						# Search for 2 or more bp for making pk
+						startPk = None
+						endPk = None
+
+						for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+							# Checy if first valid bond is found
+							stem = 0
+							if(flag[u]==2 and flag[v]==2 and CRO().Equal34(flagValid,u,v)):
+								startPair = (u,v)
+								uu = u
+								vv = v
+								while(flag[u]==2 and flag[v]==2 and CRO().Equal34(flagValid,u,v) and u<=v):
+
+									# Check if it is still valid counting the future stem
+									l1 = uu - (i + len1)
+									l2 = (j - len1 + 1) - (uu + stem+1)
+									l3 = (vv - stem-1) - j
+									stillValid = pk.LoopsFulfill(l1, l2, l3)
+									if(stillValid):
+										stem+=1
+										u+=1
+										v-=1
+										# May not needed
+										endPair = (u,v)
+									else:
+										break
+								# endwhile
+
+
+								# Revoke if not found enough stems (at least 2)
+								if(stem<2 and stem>0): # or (not stillValid)
+									f,t = startPair
+									for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+										flag[x] = 0
+										flag[y] = 0
+										flagValid[x] = 0
+										flagValid[y] = 0
+									# endfor
+
+								# add to mol and info
+								elif(stillValid):
+									f,t = startPair
+									# print(i,j,f,t,len1,stem,l1,l2,l3)
+									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+										flag[x] = 1
+										flag[y] = 1
+										mol2[x] = "["
+										mol2[y] = "]"
+
+										# Must be removed later
+										infoEnergy.append((x,y))
+									# endfor
+								# endif stem
+
+							# endif
+						# Endfor x,y
+					else:
+						marker =0 #, l1, l2, l3,len1,len2= pk.Overlap(l1, l2, l3, len1, len2)
+						if(marker):
+						# Resolvable overlap
+							# print(l1,l2,l3,"pk-OL",len1,len2)
+							pass
+
+				# end pseudo condition
+			# end for k,l, l2
+		# end for i,j,l1
+		self.structureFound = population.PrintableMolecule(mol2)
+		print(self.structureFound)
+		print("After Optimization with CRO:")
+		benchmark = open("../data/benchmark/TMV.txt","r").read()
+		print(func.Performance(self.structureFound,benchmark))
+
 		
 	# end function
 	def IsPair(c1,c2):
-	    if((c1=="A" and c2=="U") or (c1=="U" and c2=="A")):
-	        return 1
-	    elif ((c1=="G" and c2=="C") or (c1=="C" and  c2=="G")):
-	        return 1
-	    elif ((c1=="G" and c2=="U") or (c1=="U" and c2=="G")):
-	        return 1
-	    else:
-	        return 0
-    #end function
+		if((c1=="A" and c2=="U") or (c1=="U" and c2=="A")):
+			return 1
+		elif ((c1=="G" and c2=="C") or (c1=="C" and  c2=="G")):
+			return 1
+		elif ((c1=="G" and c2=="U") or (c1=="U" and c2=="G")):
+			return 1
+		else:
+			return 0
+	#end function
 	def Checkerboard(self,sequence):
 		board = []
 		for i in range(len(sequence)-1):
-		    board.append([])
-		    for j in range(0,len(sequence)-1):
-		        if(j<i):
-		            if(IsPair(sequence[i],sequence[j])):
-		                board[i].append(1)
-		            else:
-		                board[i].append(0)
-		        else:
-		            board[i].append(0)
+			board.append([])
+			for j in range(0,len(sequence)-1):
+				if(j<i):
+					if(IsPair(sequence[i],sequence[j])):
+						board[i].append(1)
+					else:
+						board[i].append(0)
+				else:
+					board[i].append(0)
 		return board
 	#End function
 
@@ -325,53 +487,48 @@ class CRO():
 		info = []
 		infoTable = []
 		for i in range(size-1,0,-1):
-		    for j in range(size-2):
-		        if(dotplot[i][j]==1 and dotplot[i-1][j+1]==1):
-		            count=0
-		            k=0
-		            while True:
-		                if (dotplot[i-k][j+k] == 1):
-		                    count+=1
-		                    dotplot[i - k][j + k] = 2
-		                else:
-		                    break
-		                k = k+1
-		            if(count>3):
-		                info.append((j,i,count))  # start, end, length
+			for j in range(size-2):
+				if(dotplot[i][j]==1 and dotplot[i-1][j+1]==1):
+					count=0
+					k=0
+					while True:
+						if (dotplot[i-k][j+k] == 1):
+							count+=1
+							dotplot[i - k][j + k] = 2
+						else:
+							break
+						k = k+1
+					if(count>3):
+						info.append((j,i,count))  # start, end, length
 
 		# sort info table
 		infoTable = sorted(info, key=lambda x: x[2],reverse=True)
 		return infoTable
 	#End function
 
-	def CalculatePE(self,w):
-		molecule = []
-		stemPool = []   
-		molecule_energy = []
-		moleculeTable = []
-		zero_one = []
-		size = len(self.sequence)
-
-		# Making dotplot
-		zero_one = CRO().Checkerboard(self.sequence)
-		# finding the diagonal 1 and mark 0, creating sorted entry table.
-		zero_one_2 = zero_one
-		infoTable = CRO().FindDiagonal(size,zero_one_2)
+	def CalculatePE(self,mole,w):
+		infoTable = []
+		sequence = mole.sequence[:]
+		size = len(sequence)
 
 		# Declaration of Variables
 		flag = []
 		flagValid = []
-		makePair = []
 		infoEnergy = []
-		pool = []
 		mol = []
-		moleculeSequence = []
+		scElements = []
+		pkElements = []
 
 		# Initialization
 		for i in range(size):
-		    flag.append(0)
-		    flagValid.append(0)
-		    mol.append(".")
+			flag.append(0)
+			flagValid.append(0)
+			mol.append(".")
+
+
+		# Retrive infotale using w
+		for i in w:
+			infoTable.append(mole.infoTable[i])
 
 		# Adding paranthesis
 		pair = 0
@@ -379,135 +536,164 @@ class CRO():
 		stempoolIndex =0
 		stem = 0
 
-		# Randomize the infoTable for each time population generation
-		#random.shuffle(infoTable)
-		infoTable1 = infoTable
-		# Molecule sequence generate for CRO operator 
-		for i in range(0,len(infoTable)-1):
-		    moleculeSequence.append(random.randint(0, len(infoTable)-1))
-		    infoTable[moleculeSequence[i]] = infoTable1[i]
-		flagStemPool=0
-        
-
+		# infoTable = mole.infoTable[:]
 		# Find for new population
-		for start,end,length in infoTable:
-		    # Search inside for making bond
-		    for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-		        if(flag[j]==0 and flag[k]==0):
-		            flag[j] = 2
-		            flag[k] = 2
-		            flagValid[j] = 1 # )
-		            flagValid[k] = 2 # (
-		            stem+=1
-		    # End for j,k
+		index = 0
+		for base in infoTable:
+			start,end,length = base
 
-		    # Can make at least 3 stems and the inside brackets are enclosed
-		    revoke = 0 #Take back all the actions
-		    if stem>=3:
-		        for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-		            if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-		                flag[j] = 1
-		                flag[k] = 1
-		                mol[j] = "("
-		                mol[k] = ")"
-		                infoEnergy.append((j,k))  # start, end
-		                makePair.append((j,k))
-		            else:
-		                revoke = 1
-		                break
-		        # End for j,k
+			# Search inside for making bond
+			for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+				if(flag[j]==0 and flag[k]==0):
+					flag[j] = 2
+					flag[k] = 2
+					flagValid[j] = 1 # (
+					flagValid[k] = 2 # )
+				# endif
+			# End for j,k
 
-		        if(revoke==1):
-		            for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-		                if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-		                    flag[j] = 0
-		                    flag[k] = 0
-		                    flagValid[j] = 0
-		                    flagValid[k] = 0
-		            flagStemPool = 1
-		    # End if stem>=3
+			# Search for 3 or more bp
+			startPair = None
+			endPair = None
 
-		    else:
-		        for j,k in zip(range(start,start+length,1),range(end,0,-1)):
-		            if(flag[j]==2 and flag[k]==2 and Equal12(flagValid,j,k)):
-		                flag[j] = 0
-		                flag[k] = 0
-		                flagValid[j] = 0
-		                flagValid[k] = 0
-		        flagStemPool = 1
+			for j,k in zip(range(start,start+length,1),range(end,0,-1)):
+				# Check if first valid bond is found
+				stem = 0
+				short = 0
 
-		    if(flagStemPool==1):
-		        pool.append((start,end,length))
-		        flagStemPool =0
+				if(flag[j]==2 and flag[k]==2 and CRO().Equal12(flagValid,j,k)):
+					startPair = (j,k)
+					while(flag[j]==2 and flag[k]==2 and CRO().Equal12(flagValid,j,k) and j<=k):
+						stem+=1
+						j+=1
+						k-=1
+						# May not needed
+						endPair = (j,k)
+					# endwhile
 
-		# End start, end, length
+					# Revoke if not found enough stems
+					if(stem<3 and stem>0):
+						f,t = startPair
+						for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+							flag[x] = 0
+							flag[y] = 0
+							flagValid[x] = 0
+							flagValid[y] = 0
+						# endfor
 
+					# Else add to mol and info
+					else:
+						f,t = startPair
+						scElements.append([f,t,stem]) # start,end,length
+						for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+							flag[x] = 1
+							flag[y] = 1
+							mol[x] = "("
+							mol[y] = ")"
+							infoEnergy.append((x,y))  # start, end
+						# endfor
+
+					# endif stem
+
+				# endif
+			# Endfor j,k
+		# Endfor basepair = start, end, length
+
+		# print(PrintableMolecule(mol))
+		# print(scElements)
 		# Finding pseudoknot
-		mol2 = mol  # make a duplicate of molecule
-		for i,j,len1 in infoTable:
-		    for k,l,len2 in pool:
-		       
-		        overlap=0
-		        overlap2=0
-		        newBond=0
-		        
-		        if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
-		            # Pseudoknot info
-		            # Loop lenght calculation for energy evaluation 
-		            l1 = k - (i + len1)
-		            l2 = (j - len1 + 1) - (k + len2)
-		            l3 = (l - len2) - j
-		            #print(l1,l2,l3,"pseudoknot")
-		            pseudoStem=0
-		            extra=0
-		            # for(u=k,v=l u<k+len2 u++,v--)
-		            for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-		                if(overlap>=2):
-		                    break
-		                if(flag[u]==0 and flag[v]==0):
-		                    flag[u] = 2
-		                    flag[v] = 2
-		                    extra+=1
-		                    pseudoStem+=1
-		                elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-		                    overlap+=1
-		                    pseudoStem+=1
-		            # End for u,v
-		            if(pseudoStem>=2):
-		                extra=0
-		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-		                    if(overlap2==2):
-		                        break
-		                    if (flag[u] == 2 and flag[v] == 2):
-		                       # print("matched at:",u,v)
-		                        flag[u] = 3
-		                        mol2[u] = '['
-		                        flag[v] = 3
-		                        mol2[v] = ']'
-		                        extra+=1
-		                    elif(extra>0 and (flag[u] != 3 and flag[v] != 3)):
-		                        overlap2+=1
-		                       # print("overlaped at:",u,v)
+		mol2 = mol[:]  # make a duplicate of molecule
+		for i,j,len1 in scElements:
+			for k,l,len2 in infoTable:
+				if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+					# Pseudoknot info
+					# Loop lenght calculation for energy evaluation
+					l1 = k - (i + len1)
+					l2 = (j - len1 + 1) - (k + len2)
+					l3 = (l - len2) - j
+					if(pk.LoopsFulfill(l1, l2, l3)):
+						# print(j,k,len2,"pk")
 
-		                        flag[u] = 3
-		                        mol2[u] = '['
-		                        flag[v] = 3
-		                        mol2[v] = ']'
-		                        mol2 = RemoveParanthesis(u,v,mol2,makePair)
-		                    # End if
-		                # End for u,v
-		            # End pseudostem
-		            else: # Revoke the flag status
-		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
-		                    if(flag[u] == 2 and flag[v] == 2):
-		                        flag[u] = 0
-		                        flag[v] = 0
-		                    # endif
-		                # End for u,v
-		            #end main loop
-		        # end pseudo condition
-		    # end for k,l, l2
+						# Search inside for making pk
+						for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+							if(flag[u]==0 and flag[v]==0):
+								flag[u] = 2
+								flag[v] = 2
+								flagValid[u] = 3 # [
+								flagValid[v] = 4 # ]
+							# endif
+						# endfor
+
+						# Search for 2 or more bp for making pk
+						startPk = None
+						endPk = None
+
+						for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+							# Checy if first valid bond is found
+							stem = 0
+							if(flag[u]==2 and flag[v]==2 and CRO().Equal34(flagValid,u,v)):
+								startPair = (u,v)
+								uu = u
+								vv = v
+								while(flag[u]==2 and flag[v]==2 and CRO().Equal34(flagValid,u,v) and u<=v):
+
+									# Check if it is still valid counting the future stem
+									l1 = uu - (i + len1)
+									l2 = (j - len1 + 1) - (uu + stem+1)
+									l3 = (vv - stem-1) - j
+									stillValid = pk.LoopsFulfill(l1, l2, l3)
+									if(stillValid):
+										stem+=1
+										u+=1
+										v-=1
+										# May not needed
+										endPair = (u,v)
+									else:
+										break
+								# endwhile
+
+
+								# Revoke if not found enough stems (at least 2)
+								if(stem<2 and stem>0): # or (not stillValid)
+									f,t = startPair
+									for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+										flag[x] = 0
+										flag[y] = 0
+										flagValid[x] = 0
+										flagValid[y] = 0
+									# endfor
+
+								# add to mol and info
+								elif(stillValid):
+									f,t = startPair
+									# print(i,j,f,t,len1,stem,l1,l2,l3)
+									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+										flag[x] = 1
+										flag[y] = 1
+										mol2[x] = "["
+										mol2[y] = "]"
+
+										# Must be removed later
+										infoEnergy.append((x,y))
+									# endfor
+								# endif stem
+
+							# endif
+						# Endfor x,y
+					else:
+						marker =0 #, l1, l2, l3,len1,len2= pk.Overlap(l1, l2, l3, len1, len2)
+						if(marker):
+						# Resolvable overlap
+							# print(l1,l2,l3,"pk-OL",len1,len2)
+							pass
+
+				# end pseudo condition
+			# end for k,l, l2
 		# end for i,j,l1
+
+		# print(PrintableMolecule(mol2))
+
 
 		# Energy calculation
 		flag1 = 0   # Found au/gu penalty
@@ -518,192 +704,218 @@ class CRO():
 		energy = 0
 		infoEnergy.sort()
 		for i in range(len(infoEnergy)-1):
-		    
-		    if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
-		        flag3 = 1
-		        flag4 = 1
-		        if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
-		            flag1 = 1
-		            flag2 = 1
-		            energy += .45
-		            energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
-		        else:
-		            energy += CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
-		    else:
-		        flag4 = 2
-		        if(flag3==1):
-		            if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
-		                energy += .45
-		                energy += .43
-		                energy += 4.09
-		                total_energy += energy
-		                flag2 = 0
-		                flag1 = 0
-		            else:
-		                if(flag1==1):
-		                    energy += .43
-		                    energy += 4.09
-		                    total_energy += energy
-		                    flag2 = 0
-		                    flag1 = 0
-		                elif(flag1 != 1):
-		                    energy += 4.09
-		                    total_energy += energy
-		                    flag2 = 0
-		                    flag1 = 0
-		                # Endifelse
-		            flag3 = 0
-		        #Endif
-		    #Endelse
+
+			if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
+				flag3 = 1
+				flag4 = 1
+				if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+					flag1 = 1
+					flag2 = 1
+					energy += .45
+					energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+				else:
+					energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+			else:
+				flag4 = 2
+				if(flag3==1):
+					if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+						energy += .45
+						energy += .43
+						energy += 4.09
+						total_energy += energy
+						flag2 = 0
+						flag1 = 0
+					else:
+						if(flag1==1):
+							energy += .43
+							energy += 4.09
+							total_energy += energy
+							flag2 = 0
+							flag1 = 0
+						elif(flag1 != 1):
+							energy += 4.09
+							total_energy += energy
+							flag2 = 0
+							flag1 = 0
+						# Endifelse
+					flag3 = 0
+				#Endif
+			#Endelse
 		#Endfor
 		if (flag4 != 2):            
-		    if (flag3 == 1):
-		        if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
-		            energy += .45
-		            energy += .43
-		            energy += 4.09
-		            total_energy += energy
-		            flag2 = 0
-		            flag1 = 0
-		        else:
-		            if (flag1 == 1):
-		                energy += .43
-		                energy += 4.09
-		                total_energy += energy
-		                flag2 = 0
-		                flag1 = 0
-		            elif (flag1 != 1):
-		                energy += 4.09
-		                total_energy += energy
-		                flag2 = 0
-		                flag1 = 0
-		        flag3 = 0
-		        #Endif
-		    #Endif
+			if (flag3 == 1):
+				if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
+					energy += .45
+					energy += .43
+					energy += 4.09
+					total_energy += energy
+					flag2 = 0
+					flag1 = 0
+				else:
+					if (flag1 == 1):
+						energy += .43
+						energy += 4.09
+						total_energy += energy
+						flag2 = 0
+						flag1 = 0
+					elif (flag1 != 1):
+						energy += 4.09
+						total_energy += energy
+						flag2 = 0
+						flag1 = 0
+				flag3 = 0
+				#Endif
+			#Endif
 		# Endif
-		molecule_energy.append(total_energy)
 
-
-		# Add molecules to the mole
-		molecule.append(mol2)
-		stemPool.append(pool)
-		moleculeTable.append(moleculeSequence)
-
-		# Clear all    
-		flagValid.clear()
-		flag.clear()
-
-		# no need to clear these, because defined in loop
-		#pool.clear()
-		#mol.clear()
 		return total_energy
 
-    
-	def CalculateEnergy(p1,p2,p3,p4):
+	def Equal12(self,flagValid,j,k):
+		one=0
+		two=0
+		if(j>k):   
+			#swap(j,k)
+			t = j
+			j = k
+			k = t
+
+		for i in range(j,k+1):
+			if(flagValid[i]==1):
+				one+=1
+			elif (flagValid[i]==2):
+				two+=1
+
+		if(one==two):
+			return True
+		else:
+			return False
+	# end function
+
+	def Equal34(self,flagValid,j,k):
+		three=0
+		four=0
+		if(j>k):   
+			#swap(j,k)
+			t = j
+			j = k
+			k = t
+
+		for i in range(j,k+1):
+			if(flagValid[i]==3):
+				three+=1
+			elif (flagValid[i]==4):
+				four+=1
+
+		if(three==four):
+			return True
+		else:
+			return False
+	# end function
+	def CalculateEnergy(self,p1,p2,p3,p4):
 		ene = 0
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'a')):
-		    ene = -.93
-		    return ene
+			ene = -.93
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
 
-		    ene = -1.10
-		    return ene
+			ene = -1.10
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
 
-		    ene = -.55
-		    return ene
+			ene = -.55
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'a')):
 
-		    ene = -1.36
-		    return ene
+			ene = -1.36
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'a')):
 
-		    ene = -2.08
-		    return ene
+			ene = -2.08
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'a')):
 
-		    ene = -2.24
-		    return ene
+			ene = -2.24
+			return ene
 
 		if ((p1 == 'u' and p2 == 'a' and p3 == 'a' and p4 == 'u')):
 
-		    ene = -1.33
-		    return ene
+			ene = -1.33
+			return ene
 
 		if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'a' and p4 == 'u')):
 
-		    ene = -1.0
-		    return ene
+			ene = -1.0
+			return ene
 
 		if ((p1 == 'u' and p2 == 'a' and p3 == 'u' and p4 == 'g') or (p1 == 'g' and p2 == 'u' and p3 == 'a' and p4 == 'u')):
 
-		    ene = -1.27
-		    return ene
+			ene = -1.27
+			return ene
 
 		if ((p1 == 'u' and p2 == 'a' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'a' and p4 == 'u')):
 
-		    ene = -2.35
-		    return ene
+			ene = -2.35
+			return ene
 
 		if ((p1 == 'a' and p2 == 'u' and p3 == 'a' and p4 == 'u') or (p1 == 'u' and p2 == 's' and p3 == 'u' and p4 == 's')):
 
-		    ene = -.93
-		    return ene
+			ene = -.93
+			return ene
 
 		if ((p1 == 'u' and p2 == 'a' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'a' and p4 == 'u') or (p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
 
-		    ene = -2.11
-		    return ene
+			ene = -2.11
+			return ene
 
 		if ((p1 == 'g' and p2 == 'u' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'u' and p4 == 'g')):
 
-		    ene = -2.51
-		    return ene
+			ene = -2.51
+			return ene
 
 		if ((p1 == 'g' and p2 == 'u' and p3 == 'g' and p4 == 'u') or (p1 == 'u' and p2 == 'g' and p3 == 'u' and p4 == 'g')):
 
-		    ene = -.5
-		    return ene
+			ene = -.5
+			return ene
 
 		if ((p1 == 'g' and p2 == 'u' and p3 == 'u' and p4 == 'g')):
 
-		    ene = +1.29
-		    return ene
+			ene = +1.29
+			return ene
 
 		if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
 
-		    ene = -1.41
-		    return ene
+			ene = -1.41
+			return ene
 
 		if ((p1 == 'u' and p2 == 'g' and p3 == 'c' and p4 == 'g') or (p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'u')):
 
-		    ene = -1.53
-		    return ene
+			ene = -1.53
+			return ene
 
 		if ((p1 == 'u' and p2 == 'g' and p3 == 'g' and p4 == 'u')):
 
-		    ene = +.3
-		    return ene
+			ene = +.3
+			return ene
 
 		if ((p1 == 'c' and p2 == 'g' and p3 == 'g' and p4 == 'c')):
 
-		    ene = -2.36
-		    return ene
+			ene = -2.36
+			return ene
 
 		if ((p1 == 'g' and p2 == 'c' and p3 == 'c' and p4 == 'g')):
 
-		    ene = -3.42
-		    return ene
+			ene = -3.42
+			return ene
 
 		if ((p1 == 'g' and p2 == 'c' and p3 == 'g' and p4 == 'c') or (p1 == 'c' and p2 == 'g' and p3 == 'c' and p4 == 'g')):
 
-		    ene = -3.26
-		    return ene
+			ene = -3.26
+			return ene
 
 		return ene
 	#End

@@ -23,12 +23,13 @@ class Molecule():
     moleculeShort = []   # Shortened molecule list of dictionary indexed with original length; size = popSize
     scElements = []      # A list of stems (may be shortened) take participate in secondary structure
     pkElements = []      # A list of stems (pseudoknotted) take participate in making pseudoknot
+    elements = []        # scElements + pkElements = uniqueElements
     def Mol(self,sequence, popSize, initialKE):
         self.sequence = sequence
         dotplot = population.Checkerboard(sequence)
         self.stemTable = population.FindDiagonal(sequence,dotplot)
         self.infoTable = self.stemTable[:]  # Copying the varible to keep original one
-        self.molecules, self.stemPool, self.infoEnergy, self.moleculeEnergy, self.moleculeTable, self.basePairs,self.infoTable,self.moleculeShort,self.scElements,self.pkElements = population.GenerateMolecule(sequence,len(sequence),popSize,self.infoTable)
+        self.molecules, self.stemPool, self.infoEnergy, self.moleculeEnergy, self.moleculeTable, self.basePairs,self.infoTable,self.moleculeShort,self.elements = population.GenerateMolecule(sequence,len(sequence),popSize,self.infoTable)
         #population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
         self.PE = self.moleculeEnergy
         self.PE1 = self.moleculeEnergy

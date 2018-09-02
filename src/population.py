@@ -90,8 +90,6 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             mol.append(".")
 
         # Adding paranthesis
-        pair = 0
-        pairIndex=0
 
         # Randomize the infoTable for each time population generation
         # random.shuffle(infoTable)
@@ -247,6 +245,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                                     f,t = startPair
                                     # print(i,j,f,t,len1,stem,l1,l2,l3)
                                     pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+                                    scElements.append([f,t,stem])
                                     for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
                                         flag[x] = 1
                                         flag[y] = 1
@@ -350,7 +349,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
 
         # Compute stemPool
         temp = []
-        pool = moleculeSequence
+        pool = moleculeSequence[:]
         for i in pool:
             fl=0
             for j in molShort:
@@ -374,7 +373,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             molecule.append(mol2)
             moleculeShort.append(molShort)
             moleculeTable.append(moleculeSequence)
-            elements.append([scElements,pkElements])
+            elements.append(scElements)
             molecule_energy.append(total_energy)
 
             test+=1
@@ -385,7 +384,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         flag.clear()
     # endfor t=popSize
 
-    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,basePairs,infoTable,moleculeShort,scElements,elements
+    return molecule,stemPool,infoEnergy, molecule_energy,moleculeTable,basePairs,infoTable,moleculeShort,elements
 # end function
 
 def RemoveParanthesis(u,v,mol2,makePair):

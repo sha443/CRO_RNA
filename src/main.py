@@ -8,12 +8,12 @@ from cro import CRO
 
 class main():
 	def __init__(self):
-		filename = "TYMV.txt"
+		filename = "TMV.txt"
 		path = "../data/"
 		file = open(path+"input/"+filename,"r",)
 		sequence = file.readline()
 		# Parameters
-		iteration = 1
+		iteration = 10
 		popSize = 10
 		KELossRate= 0.8
 		MoleColl= 0.5
@@ -52,10 +52,13 @@ class main():
 		print(predicted,end="\t")
 		print(minEnergy)
 		print("(sp, sen, f, tp, fp, fn)")
+		print("==================================")
+		print("Before CRO:")
 		# sensitivity,specificity,f_measure,true_basepair,false_positive_basepair,false_negative_basepair
 		print(func.Performance(predicted,benchmark))
-		print(mole.pkElements[minIndex])
-		
+		print(mole.elements[minIndex])
+
+
 		#----------------------------------------------------------------------------------------------
 		# Initial INN-HB energy calculation
 		#----------------------------------------------------------------------------------------------
@@ -69,6 +72,7 @@ class main():
 		C  = CRO()
 		# C.Init(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole)
 		C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path+"output/",filename)
+
 	# end function
 # end class
 # for i in range(10):
