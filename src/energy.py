@@ -380,19 +380,13 @@ def Turner(infoEnergy,sequence):
 # end function
 
 def Turner04Handlar(basePairs,sequence):
-	for base in basePairs:
-		i,j,length = base
-		stem = []
-		for left,right in zip(range(i,i+length),range(j,j-length,-1)):
-			stem.append([left,right])
-		# endfor
-
-		energy = Turner04(stem,sequence)
-		basePairs[base] = energy
+	i,j,length = basePairs
+	stem = []
+	for left,right in zip(range(i,i+length),range(j,j-length,-1)):
+		stem.append([left,right])
 	# endfor
-	bp = [(k, basePairs[k]) for k in sorted (basePairs,key = basePairs.get)]
-	# sorted(basePairs)
-	return bp
+	energy = Turner04(stem,sequence)
+	return energy
 # end function
 
 def Turner04(stem,sequence):

@@ -5,22 +5,23 @@ class Operators():
     # OnWall Ineffective Colision
     ######################################################################
     def OnWall (self,molecule):
-        moleculeNew = molecule
+        m = molecule
         i = random.randint(0, len(molecule)-1)
         j = random.randint(0, len(molecule)-1)
 
         if (molecule[i] + j <= len(molecule)):
-            moleculeNew[i] = molecule[i] + j
+            m[i] = molecule[i] + j
         else:
             if(molecule[i]>j):
-                moleculeNew[i] = molecule[i] - j
+                m[i] = molecule[i] - j
             else:
-                moleculeNew[i] =  j - molecule[i]
+                m[i] =  j - molecule[i]
             # Endif
         #Endif
-        #print(moleculeNew)
-        
-        return moleculeNew
+        # print(m)
+        m = Operators().Repair(m)
+
+        return m
 
     ######################################################################
     # Decomposition
@@ -66,6 +67,9 @@ class Operators():
         # print(m1)
         # print(m2)
         # Return 2 new molecule
+        m1 = Operators().Repair(m1)
+        m2 = Operators().Repair(m2)
+
         return m1,m2
 
     ######################################################################
@@ -100,6 +104,9 @@ class Operators():
         # print(m1)
         # print(m2)
         # Return 2 new molecule
+        m1 = Operators().Repair(m1)
+        m2 = Operators().Repair(m2)
+
         return m1,m2
 
 
@@ -119,8 +126,19 @@ class Operators():
 
         #test
         # print(m)
+
+        m = Operators().Repair(m)
         return m
 
+    ######################################################################
+    # Repair operator
+    ######################################################################
+    def Repair(self,molecule):
+        unique = []
+        for n in molecule:
+            if n not in unique:
+                unique.append(n)
+        return unique
 
 ######################################################################
 #Module Test

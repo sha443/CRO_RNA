@@ -9,6 +9,8 @@ L2_UPPER = 50
 L3_LOWER = 2 
 L3_UPPER = 100
 
+def PseudoknotHandler(pkElements):
+    cc06,cc09,longPk = ScanList(pkElements)
 
 def LoopsFulfill(l1, l2, l3):
     loops_fulfilled = False

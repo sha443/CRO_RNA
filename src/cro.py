@@ -3,6 +3,7 @@ from operators import Operators
 from molecule import Molecule
 import pseudoknot as pk
 import population
+import energy
 from function import Function as func
 class CRO():
 
@@ -268,10 +269,10 @@ class CRO():
 		energyAfter.write(hits)
 		energyAfter.write("\n======================================================\n")
 
-		CRO().FindMinimumStructure(mole,minEnrg,minEnrgIndex)
+		CRO().FindMinimumStructure(mole,minEnrg,minEnrgIndex,fileName,sequence)
 	#end function
 
-	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex):		
+	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex,fileName,sequence):		
 		flag = []
 		mol = []
 		flagValid = []
@@ -450,10 +451,11 @@ class CRO():
 				# end pseudo condition
 			# end for k,l, l2
 		# end for i,j,l1
+		predictedEnergy = energy.Turner(infoEnergy,sequence)
 		self.structureFound = population.PrintableMolecule(mol2)
-		print(self.structureFound)
+		print(self.structureFound,"\t",predictedEnergy)
 		print("After Optimization with CRO:")
-		benchmark = open("../data/benchmark/TMV.txt","r").read()
+		benchmark = open("../data/benchmark/"+fileName,"r").read()
 		print(func.Performance(self.structureFound,benchmark))
 
 		

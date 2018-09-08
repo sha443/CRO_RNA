@@ -8,7 +8,7 @@ from cro import CRO
 
 class main():
 	def __init__(self):
-		filename = "TMV.txt"
+		filename = "TYMV.txt"
 		path = "../data/"
 		file = open(path+"input/"+filename,"r",)
 		sequence = file.readline()
@@ -28,6 +28,7 @@ class main():
 		sequence = sequence.upper()
 		mole = Molecule()
 		mole.Mol(sequence, popSize, InitialKE)
+		
 
 		# Save initial informations
 		minEnergy = 99999
@@ -64,7 +65,7 @@ class main():
 		#----------------------------------------------------------------------------------------------
 		# Unique stemlist energy
 		# Sorted by energy in ascending order
-		basePairsEnergy = energy.Turner04Handlar(mole.basePairs,sequence)
+		# basePairsEnergy = energy.Turner04Handlar(mole.basePairs,sequence)
 		# print(basePairsEnergy)
 		#----------------------------------------------------------------------------------------------
 		# Optimize with CRO
