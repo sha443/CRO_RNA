@@ -33,7 +33,7 @@ class Molecule():
         #population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
         self.PE = self.moleculeEnergy
         self.PE1 = self.moleculeEnergy
-        for i in range(0,len(self.moleculeTable)):
+        for i in range(len(self.moleculeTable)):
             self.KE.append(initialKE)
             self.KE1.append(initialKE)
             self.numHit.append(0)

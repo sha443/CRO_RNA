@@ -7,8 +7,7 @@ from cro import CRO
 
 
 class main():
-	def __init__(self):
-		filename = "TYMV.txt"
+	def __init__(self,filename):
 		path = "../data/"
 		file = open(path+"input/"+filename,"r",)
 		sequence = file.readline()
@@ -77,6 +76,8 @@ class main():
 	# end function
 # end class
 # for i in range(10):
-program = main()
+
+filename = "LRSVbeta.txt"
+program = main(filename)
 
 

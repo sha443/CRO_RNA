@@ -157,6 +157,9 @@ class CRO():
 		pe_new = CRO().CalculatePE(mole,newMol)
 
 		if((mole.PE1[index1]+mole.PE1[index2] + mole.KE1[index1]+mole.KE1[index2])>=pe_new):
+			
+			ke_new = (mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - pe_new
+
 			del mole.moleculeTable[index1]
 			del mole.PE1[index1]
 			del mole.KE1[index1]
@@ -164,6 +167,10 @@ class CRO():
 			del mole.minHit[index1]
 			del mole.minStruct[index1]
 			del mole.minPE[index1]
+
+			if(index2>=index1):
+				# position of index2 is decreased by 1
+				index2 = index2 -1
 
 			del mole.moleculeTable[index2]
 			del mole.PE1[index2]
@@ -175,7 +182,7 @@ class CRO():
 
 			mole.moleculeTable.append(newMol)
 			mole.PE1.append(pe_new)
-			mole.KE1.append((mole.PE1[index1] + mole.PE1[index2] + mole.KE1[index1] + mole.KE1[index2]) - pe_new)
+			mole.KE1.append(ke_new)
 			mole.numHit.append(0)
 			mole.minHit.append(0)
 			mole.minStruct.append(newMol)
@@ -195,7 +202,7 @@ class CRO():
 		w = None
 		oldMol1 = None
 		oldMol2 = None
-		index, index1, index2 = None,None,None
+		index, index1, index2 = 0,0,0
 		minEnrg = 1000
 		sl=0
 
@@ -224,7 +231,7 @@ class CRO():
 			b = random.uniform(0,1)
 			# Decomposition or OnwallIneffectiveCollision
 			if (b>MoleColl):
-				index = random.randint(0, len(mole.PE1)-1)
+				index = random.randint(0, len(mole.KE1)-1)
 				if ((mole.numHit[index]-mole.minHit[index])>alpha):
 					dec+=1
 					CRO().Decomposition(mole,mole.moleculeTable[index], index)
@@ -237,8 +244,8 @@ class CRO():
 
 			# Synthesis or IntermolecularIneffectiveCollision
 			else:
-				index1 = random.randint(0, len(mole.PE1)-1)
-				index2 = random.randint(0, len(mole.PE1)-1)
+				index1 = random.randint(0, len(mole.KE1)-1)
+				index2 = random.randint(0, len(mole.KE1)-1)
 				if ((mole.KE1[index1]+mole.KE1[index2])<beta):
 					syn+=1
 					CRO().Synthesis(mole,mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
@@ -428,6 +435,7 @@ class CRO():
 									f,t = startPair
 									# print(i,j,f,t,len1,stem,l1,l2,l3)
 									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+									scElements.append([j,k,stem])
 									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 										flag[x] = 1
 										flag[y] = 1
@@ -451,9 +459,15 @@ class CRO():
 				# end pseudo condition
 			# end for k,l, l2
 		# end for i,j,l1
-		predictedEnergy = energy.Turner(infoEnergy,sequence)
+		# Energy evaluation
+
+		energyFound = 0
+		for stem in scElements:
+			energyFound+= energy.Turner04Handlar(stem,sequence)
+		# endfor
+
 		self.structureFound = population.PrintableMolecule(mol2)
-		print(self.structureFound,"\t",predictedEnergy)
+		print(self.structureFound,"\t",energyFound)
 		print("After Optimization with CRO:")
 		benchmark = open("../data/benchmark/"+fileName,"r").read()
 		print(func.Performance(self.structureFound,benchmark))
@@ -670,6 +684,7 @@ class CRO():
 									f,t = startPair
 									# print(i,j,f,t,len1,stem,l1,l2,l3)
 									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+									scElements.append([f,t,stem])
 									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 										flag[x] = 1
 										flag[y] = 1
@@ -696,81 +711,17 @@ class CRO():
 
 		# print(PrintableMolecule(mol2))
 
+		# Energy evaluation
 
-		# Energy calculation
-		flag1 = 0   # Found au/gu penalty
-		flag2 = 0   # Check if it is the first input
-		flag3 = 0
-		flag4 = 0
-		total_energy = 0
-		energy = 0
-		infoEnergy.sort()
-		for i in range(len(infoEnergy)-1):
+		turnerEnergy = 0
+		for stem in scElements:
+		    turnerEnergy+= energy.Turner04Handlar(stem,sequence)
+        # endfor
 
-			if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
-				flag3 = 1
-				flag4 = 1
-				if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
-					flag1 = 1
-					flag2 = 1
-					energy += .45
-					energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
-				else:
-					energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
-			else:
-				flag4 = 2
-				if(flag3==1):
-					if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
-						energy += .45
-						energy += .43
-						energy += 4.09
-						total_energy += energy
-						flag2 = 0
-						flag1 = 0
-					else:
-						if(flag1==1):
-							energy += .43
-							energy += 4.09
-							total_energy += energy
-							flag2 = 0
-							flag1 = 0
-						elif(flag1 != 1):
-							energy += 4.09
-							total_energy += energy
-							flag2 = 0
-							flag1 = 0
-						# Endifelse
-					flag3 = 0
-				#Endif
-			#Endelse
-		#Endfor
-		if (flag4 != 2):            
-			if (flag3 == 1):
-				if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
-					energy += .45
-					energy += .43
-					energy += 4.09
-					total_energy += energy
-					flag2 = 0
-					flag1 = 0
-				else:
-					if (flag1 == 1):
-						energy += .43
-						energy += 4.09
-						total_energy += energy
-						flag2 = 0
-						flag1 = 0
-					elif (flag1 != 1):
-						energy += 4.09
-						total_energy += energy
-						flag2 = 0
-						flag1 = 0
-				flag3 = 0
-				#Endif
-			#Endif
-		# Endif
-
-		return total_energy
+        # Pseudoknot energy
+		pkEnergy = pk.PseudoknotHandler(pkElements)
+	
+		return turnerEnergy
 
 	def Equal12(self,flagValid,j,k):
 		one=0

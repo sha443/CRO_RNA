@@ -134,11 +134,12 @@ class Operators():
     # Repair operator
     ######################################################################
     def Repair(self,molecule):
-        unique = []
-        for n in molecule:
-            if n not in unique:
-                unique.append(n)
-        return unique
+        # unique = []
+        # for n in molecule:
+        #     if n not in unique:
+        #         unique.append(n)
+        # return unique
+        return molecule
 
 ######################################################################
 #Module Test

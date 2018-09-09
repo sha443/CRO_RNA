@@ -71,8 +71,9 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
     elements = []
     basePairs = {}
     test = 0
+    fails = 0
 
-    while(test<popSize):
+    while(test<=popSize):
         flag = []
         flagValid = []
         makePair = []
@@ -304,8 +305,9 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
 
         # Add molecules to the mole
         # Caution: This may lead to infinite loop sometime if the structure contains no pseudoknot
-        if(mol==mol2):
-            # print("No Pseudoknot detected!")
+        if(mol==mol2 and fails<popSize):
+            # print("Case : ",test," No Pseudoknot detected!")
+            fails+=1
             continue
         else:
             molecule.append(mol2)

@@ -265,3 +265,78 @@ Replaced by turnerHandler calling
         #         #Endif
         #     #Endif
         # # Endif
+
+        cro.py
+        # Energy calculation
+
+        flag1 = 0   # Found au/gu penalty
+        flag2 = 0   # Check if it is the first input
+        flag3 = 0
+        flag4 = 0
+        total_energy = 0
+        energy = 0
+        infoEnergy.sort()
+        for i in range(len(infoEnergy)-1):
+
+            if(infoEnergy[i][0]+1==infoEnergy[i+1][0]):
+                flag3 = 1
+                flag4 = 1
+                if (flag2 == 0 and ((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]]== 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+                    flag1 = 1
+                    flag2 = 1
+                    energy += .45
+                    energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+                else:
+                    energy += CRO().CalculateEnergy(sequence[infoEnergy[i][0]], sequence[infoEnergy[i][1]], sequence[infoEnergy[i+1][0]], sequence[infoEnergy[i+1][1]])
+            else:
+                flag4 = 2
+                if(flag3==1):
+                    if (((sequence[infoEnergy[i][0]] == 'A') or (sequence[infoEnergy[i][0]] == 'U') or (sequence[infoEnergy[i][0]] == 'G' and sequence[infoEnergy[i][1]] == 'U') or (sequence[infoEnergy[i][0]] == 'U' and sequence[infoEnergy[i][1]] == 'G'))):
+                        energy += .45
+                        energy += .43
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                    else:
+                        if(flag1==1):
+                            energy += .43
+                            energy += 4.09
+                            total_energy += energy
+                            flag2 = 0
+                            flag1 = 0
+                        elif(flag1 != 1):
+                            energy += 4.09
+                            total_energy += energy
+                            flag2 = 0
+                            flag1 = 0
+                        # Endifelse
+                    flag3 = 0
+                #Endif
+            #Endelse
+        #Endfor
+        if (flag4 != 2):            
+            if (flag3 == 1):
+                if (((sequence[infoEnergy[len(infoEnergy)-1][0]] == 'A') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'G' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'U') or (sequence[infoEnergy[len(infoEnergy) - 1][0]] == 'U' and sequence[infoEnergy[len(infoEnergy) - 1][1]] == 'G'))):
+                    energy += .45
+                    energy += .43
+                    energy += 4.09
+                    total_energy += energy
+                    flag2 = 0
+                    flag1 = 0
+                else:
+                    if (flag1 == 1):
+                        energy += .43
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                    elif (flag1 != 1):
+                        energy += 4.09
+                        total_energy += energy
+                        flag2 = 0
+                        flag1 = 0
+                flag3 = 0
+                #Endif
+            #Endif
+        # Endif
