@@ -11,6 +11,7 @@ class main():
 		path = "../data/"
 		file = open(path+"input/"+filename,"r",)
 		sequence = file.readline()
+		
 		# Parameters
 		iteration = 10
 		popSize = 10
@@ -28,7 +29,6 @@ class main():
 		mole = Molecule()
 		mole.Mol(sequence, popSize, InitialKE)
 		
-
 		# Save initial informations
 		minEnergy = 99999
 		index = 0
@@ -77,7 +77,5 @@ class main():
 # end class
 # for i in range(10):
 
-filename = "LRSVbeta.txt"
+filename = "CcTMV.txt"
 program = main(filename)
-
-

@@ -145,7 +145,12 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                     # endwhile
 
                     # Revoke if not found enough stems
-                    if(stem<3 and stem>0):
+                    # Or like this :-P   ...((()))..
+                    # Leave out kissing hairpin loop
+                    f,t = startPair
+                    khp = ((t-stem+1) - (f+stem))
+                    # print(khp,'KHP',[f,t,stem])
+                    if(stem<3 and stem>0 or (khp==0 and stem<4)):
                         f,t = startPair
                         for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
                             flag[x] = 0
@@ -157,6 +162,11 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                     # Else add to mol and info
                     else:
                         f,t = startPair
+                        # Leave khp first then bond
+                        if(khp==0):
+                            stem-= 1
+                        # endif
+
                         scElements.append([f,t,stem]) # start,end,length
                         for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
                             flag[x] = 1
@@ -182,6 +192,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         # print(scElements)
         # Finding pseudoknot
         mol2 = mol[:]  # make a duplicate of molecule
+        mol3 = mol[:]  # make a duplicate of molecule
         for i,j,len1 in scElements:
             for k,l,len2 in infoTable:
                 if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
@@ -261,19 +272,91 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                                 # endif stem
 
                             # endif
-                        # Endfor x,y
-                    else:
-                        marker =0 #, l1, l2, l3,len1,len2= pk.Overlap(l1, l2, l3, len1, len2)
+                        # Endfor u,v
+                    # Endif LoopsFulfill
+                    # Overlap testing
+                    mol3 = mol2[:]
+                    if (l2 == -1 or l2 == -2) and (len1 > 3 or len2 > 3):
+                        marker, l1, l2, l3,len1,len2= pk.Overlap(l1, l2, l3, len1, len2)
                         if(marker):
                         # Resolvable overlap
-                            # print(l1,l2,l3,"pk-OL",len1,len2)
-                            pass
-                    
-                # end pseudo condition
+                            # Search inside for making pk
+                            for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                                if(flag[u]==0 and flag[v]==0):
+                                    flag[u] = 2
+                                    flag[v] = 2
+                                    flagValid[u] = 3 # [
+                                    flagValid[v] = 4 # ]
+                                # endif
+                            # endfor
+
+                            # Search for 2 or more bp for making pk
+                            startPk = None
+                            endPk = None
+
+                            for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                                # Checy if first valid bond is found
+                                stem = 0
+                                if(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v)):
+                                    startPair = (u,v)
+                                    uu = u
+                                    vv = v
+                                    while(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v) and u<=v):
+                                        
+                                        # Check if it is still valid counting the future stem
+                                        l1 = uu - (i + len1)
+                                        l2 = (j - len1 + 1) - (uu + stem+1)
+                                        l3 = (vv - stem-1) - j
+                                        stillValid = pk.LoopsFulfill(l1, l2, l3)
+                                        if(stillValid):
+                                            stem+=1
+                                            u+=1
+                                            v-=1
+                                            # May not needed
+                                            endPair = (u,v)
+                                        else:
+                                            break
+                                    # endwhile
+
+                                    
+                                    # Revoke if not found enough stems (at least 2)
+                                    if(stem<2 and stem>0): # or (not stillValid)
+                                        f,t = startPair
+                                        for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+                                            flag[x] = 0
+                                            flag[y] = 0
+                                            flagValid[x] = 0
+                                            flagValid[y] = 0
+                                        # endfor
+
+                                    # add to mol and info
+                                    elif(stillValid):
+                                        f,t = startPair
+                                        # print(i,j,f,t,len1,stem,l1,l2,l3)
+                                        pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+                                        scElements.append([f,t,stem])
+                                        for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+                                            flag[x] = 1
+                                            flag[y] = 1
+                                            mol3[x] = "["
+                                            mol3[y] = "]"
+
+                                            # Must be removed later
+                                            infoEnergy.append((x,y))
+                                            makePair.append((x,y))
+                                        # endfor
+                                    # endif stem
+
+                                # endif
+                            # Endfor u,v
+                        # Endif marker
+                    # endif overlap
+                # endif pseudo condition
             # end for k,l, l2
         # end for i,j,l1
 
-        # print(PrintableMolecule(mol2))
+        # print(PrintableMolecule(mol2),"mol2")
+        # print(PrintableMolecule(mol3),"mol3")
 
         # Energy evaluation
 
@@ -283,8 +366,9 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         # endfor
 
         # Pseudoknot energy
-        pkEnergy = pk.PseudoknotHandler(pkElements)
-
+        if(pkElements):
+            pkEnergy = pk.PseudoknotHandler(pkElements)
+            # print(pkEnergy)
 
         # Compute stemPool
         temp = []
@@ -301,7 +385,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
 
             # Endfor
         # Endfor
-        stemPool[t] = temp
+        # stemPool[t] = temp
 
         # Add molecules to the mole
         # Caution: This may lead to infinite loop sometime if the structure contains no pseudoknot

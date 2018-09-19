@@ -125,7 +125,6 @@ class Function():
 	# end function
 
 	def Performance(predicted,benchmark):
-
 		true_basepair = 0
 		a = 0
 		c = 0
