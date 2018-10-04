@@ -53,7 +53,7 @@ def FindDiagonal(sequence,dotplot):
                     else:
                         break
                     k = k+1
-                if(count>3):
+                if(count>2):
                     info.append((j,i,count))  # start, end, length
 
     # sort info table in descending order
@@ -108,7 +108,9 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             infoTable[moleculeSequence[i]] = infoTable1[i]
 
 
+        # ============================================
         # Find for new population
+        # ============================================
         index = 0
         for base in infoTable:
             start,end,length = base
@@ -190,10 +192,13 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
 
         # print(PrintableMolecule(mol))
         # print(scElements)
+
+        # ============================================
         # Finding pseudoknot
+        # ============================================
         mol2 = mol[:]  # make a duplicate of molecule
         mol3 = mol[:]  # make a duplicate of molecule
-        for i,j,len1 in scElements:
+        for i,j,len1 in infoTable:
             for k,l,len2 in infoTable:
                 if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
                     # Pseudoknot info
@@ -297,11 +302,11 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                             for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
                                 # Checy if first valid bond is found
                                 stem = 0
-                                if(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v)):
+                                if(flag[u]==2 and flag[v]==2):# and Equal34(flagValid,u,v)):
                                     startPair = (u,v)
                                     uu = u
                                     vv = v
-                                    while(flag[u]==2 and flag[v]==2 and Equal34(flagValid,u,v) and u<=v):
+                                    while(flag[u]==2 and flag[v]==2 ):#and Equal34(flagValid,u,v) and u<=v):
                                         
                                         # Check if it is still valid counting the future stem
                                         l1 = uu - (i + len1)
@@ -355,8 +360,99 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             # end for k,l, l2
         # end for i,j,l1
 
+
+        # ======================================================
+        # Finding Recursive Pseudoknot
+        # ======================================================
+        mol4 = mol2[:]  # make a duplicate of molecule 2; mol3 is equal to mole2 at this time.
+        for i,j,len1 in scElements:
+            for k,l,len2 in infoTable:
+                if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+                    # Pseudoknot info
+                    # Loop lenght calculation for energy evaluation 
+                    l1 = k - (i + len1)
+                    l2 = (j - len1 + 1) - (k + len2)
+                    l3 = (l - len2) - j
+                    if(pk.LoopsFulfill(l1, l2, l3)):
+                        # print(j,k,len2,"pk")
+
+                        # Search inside for making pk
+                        for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                            if(flag[u]==0 and flag[v]==0):
+                                flag[u] = 3
+                                flag[v] = 3
+                                flagValid[u] = 5 # {
+                                flagValid[v] = 6 # }
+                            # endif
+                        # endfor
+
+                        # Search for 2 or more bp for making pk
+                        startPk = None
+                        endPk = None
+
+                        for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+                            # Checy if first valid bond is found
+                            stem = 0
+                            if(flag[u]==3 and flag[v]==3 and Equal56(flagValid,u,v)):
+                                startPair = (u,v)
+                                uu = u
+                                vv = v
+                                while(flag[u]==3 and flag[v]==3 and Equal56(flagValid,u,v) and u<=v):
+                                    
+                                    # Check if it is still valid counting the future stem
+                                    l1 = uu - (i + len1)
+                                    l2 = (j - len1 + 1) - (uu + stem+1)
+                                    l3 = (vv - stem-1) - j
+                                    stillValid = pk.LoopsFulfill(l1, l2, l3)
+                                    if(stillValid):
+                                        stem+=1
+                                        u+=1
+                                        v-=1
+                                        # May not needed
+                                        endPair = (u,v)
+                                    else:
+                                        break
+                                # endwhile
+
+                                
+                                # Revoke if not found enough stems (at least 2)
+                                if(stem<2 and stem>0): # or (not stillValid)
+                                    f,t = startPair
+                                    for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+                                        flag[x] = 0
+                                        flag[y] = 0
+                                        flagValid[x] = 0
+                                        flagValid[y] = 0
+                                    # endfor
+
+                                # add to mol and info
+                                elif(stillValid):
+                                    f,t = startPair
+                                    # print(i,j,f,t,len1,stem,l1,l2,l3)
+                                    pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+                                    scElements.append([f,t,stem])
+                                    for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+                                        flag[x] = 1
+                                        flag[y] = 1
+                                        mol4[x] = "{"
+                                        mol4[y] = "}"
+
+                                        # Must be removed later
+                                        infoEnergy.append((x,y))
+                                        makePair.append((x,y))
+                                    # endfor
+                                # endif stem
+
+                            # endif
+                        # Endfor u,v
+                    # Endif LoopsFulfill
+                # endif pseudo condition
+            # end for k,l, l2
+        # end for i,j,l1
+
+
         # print(PrintableMolecule(mol2),"mol2")
-        # print(PrintableMolecule(mol3),"mol3")
+        # print(PrintableMolecule(mol3),"mol4")
 
         # Energy evaluation
 
@@ -394,7 +490,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             fails+=1
             continue
         else:
-            molecule.append(mol2)
+            molecule.append(mol4)
             moleculeShort.append(molShort)
             moleculeTable.append(moleculeSequence)
             elements.append(scElements)
@@ -464,6 +560,28 @@ def Equal34(flagValid,j,k):
     else:
         return False
 # end function
+
+def Equal56(flagValid,j,k):
+    five=0
+    six=0
+    if(j>k):   
+        #swap(j,k)
+        t = j
+        j = k
+        k = t
+
+    for i in range(j,k+1):
+        if(flagValid[i]==5):
+            five+=1
+        elif (flagValid[i]==6):
+            six+=1
+    
+    if(five==six):
+        return True
+    else:
+        return False
+# end function
+
 # Calclates the Gibbs free energy of a molecule on INN-HB model
 def CalculateEnergy(p1, p2, p3, p4):
         

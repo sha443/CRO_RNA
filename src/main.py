@@ -11,6 +11,7 @@ class main():
 		path = "../data/"
 		file = open(path+"input/"+filename,"r",)
 		sequence = file.readline()
+		print(sequence)
 		
 		# Parameters
 		iteration = 10
@@ -77,5 +78,5 @@ class main():
 # end class
 # for i in range(10):
 
-filename = "CcTMV.txt"
+filename = "CGMMV.txt"
 program = main(filename)
