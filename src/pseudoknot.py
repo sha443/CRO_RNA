@@ -1,4 +1,4 @@
-
+import energy
 # Condition for loops to form a pseudoknot
 L1_LOWER = 1
 L1_UPPER = 100
@@ -9,8 +9,28 @@ L2_UPPER = 50
 L3_LOWER = 2 
 L3_UPPER = 100
 
-def PseudoknotHandler(pkElements):
+# LongPK constants
+INIT = 7.0
+PENALTY = 0.1
+
+def PseudoknotHandler(scElements,pkElements,seq):
     cc06,cc09,longPk = ScanList(pkElements)
+    ene = 0
+    if(cc06):
+        CC06Result = energy.CC06(cc06,seq)
+        for allEnergy in CC06Result:
+            ene += CC06Result[allEnergy]
+            # print(CC06Result[allEnergy])
+    # if(cc09):
+    #     ene = energy.CC09(cc09,scElements)
+    #     print(ene)
+    if(longPk):
+        longPkResult= energy.LongPK(longPk, scElements, INIT, PENALTY)
+        for allEnergy in longPkResult:
+            ene += longPkResult[allEnergy]
+            # print(longPkResult[allEnergy])
+    return ene
+# end function
 
 def LoopsFulfill(l1, l2, l3):
     loops_fulfilled = False
@@ -115,14 +135,17 @@ def ScanList(pkList):
     longPk = []
 
     for pkStem in pkList:
+
         i, j, k, l, stemlength1, stemlength2, l1, l2, l3 = pkStem
         if l2 <= 1:
             cc06.append(pkStem)
         else:
-            if l2 < 7: 
-                cc09.append(pkStem)
-            else:
-                longPk.append(pkStem)
+            longPk.append(pkStem)
+
+            # if l2 < 7: 
+            #     cc09.append(pkStem)
+            # else:
+            #     longPk.append(pkStem)
         
     return cc06,cc09,longPk
 # end function

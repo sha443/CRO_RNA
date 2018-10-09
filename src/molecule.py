@@ -1,5 +1,5 @@
 import population
-
+from operators import Operators
 class Molecule():
     # Molecule strcuture 
     PE = []             # PE of molecule during initial population generation
@@ -29,6 +29,13 @@ class Molecule():
         dotplot = population.Checkerboard(sequence)
         self.stemTable = population.FindDiagonal(sequence,dotplot)
         self.infoTable = self.stemTable[:]  # Copying the varible to keep original one
+        # print(self.infoTable,'before')
+
+        # RepairKHP operator
+        Op = Operators()
+        self.infoTable = Op.RepairKHP(self.infoTable)
+        # print(self.infoTable,'after')
+
         self.molecules, self.stemPool, self.infoEnergy, self.moleculeEnergy, self.moleculeTable, self.basePairs,self.infoTable,self.moleculeShort,self.elements = population.GenerateMolecule(sequence,len(sequence),popSize,self.infoTable)
         #population.PrintInfo(molecule,stemPool,infoEnergy,moleculeEnergy)
         self.PE = self.moleculeEnergy

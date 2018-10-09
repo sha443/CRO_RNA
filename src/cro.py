@@ -5,6 +5,7 @@ import pseudoknot as pk
 import population
 import energy
 from function import Function as func
+import tictoc
 class CRO():
 
 	# Variables
@@ -213,11 +214,11 @@ class CRO():
 			#endif
 		#endfor
 
-		# Energy save
-		energyBefore = open(path+"initial_population_"+fileName,"a")
-		energyBefore.write("Minimum energy: "+str(minEnrg))
-		energyBefore.write(" at position: "+str(sl))
-		energyBefore.write("\n======================================================\n")
+		# Save Initials
+		# energyBefore = open(path+"output/initial_population_"+fileName,"a")
+		# energyBefore.write("Minimum energy: "+str(minEnrg))
+		# energyBefore.write(" at position: "+str(sl))
+		# energyBefore.write("\n======================================================\n")
 
 		# Oprators hit counter
 		on = 0
@@ -232,6 +233,7 @@ class CRO():
 			# Decomposition or OnwallIneffectiveCollision
 			if (b>MoleColl):
 				index = random.randint(0, len(mole.KE1)-1)
+				# print(index)
 				if ((mole.numHit[index]-mole.minHit[index])>alpha):
 					dec+=1
 					CRO().Decomposition(mole,mole.moleculeTable[index], index)
@@ -246,6 +248,7 @@ class CRO():
 			else:
 				index1 = random.randint(0, len(mole.KE1)-1)
 				index2 = random.randint(0, len(mole.KE1)-1)
+				# print(index1,index2)
 				if ((mole.KE1[index1]+mole.KE1[index2])<beta):
 					syn+=1
 					CRO().Synthesis(mole,mole.moleculeTable[index1], mole.moleculeTable[index2], index1, index2)
@@ -256,6 +259,9 @@ class CRO():
 				#endelse
 			#end else
 		# Endfor iteration
+
+		# End timer
+		tm = tictoc.toc()
 		
 		# Finding minimum energy
 		minEnrg = 1000
@@ -269,17 +275,29 @@ class CRO():
 				minEnrgIndex = j
 			#endif
 		#endfor
-		hits = "onwall= "+str(on) +" Dec = "+str(dec)+" Syn = "+str(syn)+" Intermolecular = "+str(inef)
-		print(hits)
-		# Energy save
-		energyAfter = open(path+"final_population_"+fileName,"a")
-		energyAfter.write(hits)
-		energyAfter.write("\n======================================================\n")
+		hits = "Onwall= "+str(on) +"\tDec = "+str(dec)+"\tSyn = "+str(syn)+"\tIntermolecular = "+str(inef)+"\n"
+		sen,sp,f_m,tp,fp,fn,structureFound,totalEnergy = CRO().FindMinimumStructure(mole,minEnrg,minEnrgIndex,path,fileName,sequence)
 
-		CRO().FindMinimumStructure(mole,minEnrg,minEnrgIndex,fileName,sequence)
+		# Save information 
+		energyAfter = open(path+"output/final_population_"+fileName,"a")
+
+		energyAfter.write("\n======================================================\n")
+		energyAfter.write(hits)
+		outputString = "sen=%.2f \tsp=%.2f \tf_measure=%.2f \ttp=%d \tfp=%d \tfn=%d \n" %(sen,sp,f_m,tp,fp,fn)
+		energyAfter.write(outputString)
+		strucreNenergy = structureFound+"\t%.2f" % (totalEnergy)
+		energyAfter.write(strucreNenergy)
+		energyAfter.write("\n"+tm)
+		
+		# Log:
+		print("[sen,sp,f-measure]")
+		print([sen,sp,f_m])
+		print([structureFound,totalEnergy])
+
+
 	#end function
 
-	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex,fileName,sequence):		
+	def FindMinimumStructure(self,mole,minEnrg,minEnrgIndex,path,fileName,sequence):		
 		flag = []
 		mol = []
 		flagValid = []
@@ -469,17 +487,25 @@ class CRO():
 			# end for k,l, l2
 		# end for i,j,l1
 		# Energy evaluation
-
-		energyFound = 0
+		turnerEnergy = 0
 		for stem in scElements:
-			energyFound+= energy.Turner04Handlar(stem,sequence)
+			turnerEnergy+= energy.Turner04Handlar(stem,sequence)
 		# endfor
 
+        # Pseudoknot energy
+		pkEnergy = 0
+		if(pkElements):
+			pkEnergy = pk.PseudoknotHandler(scElements,pkElements,sequence)
+            # print(pkEnergy)
+
+		totalEnergy = turnerEnergy+pkEnergy
+
 		self.structureFound = population.PrintableMolecule(mol2)
-		print(self.structureFound,"\t",energyFound)
-		print("After Optimization with CRO:")
-		benchmark = open("../data/benchmark/"+fileName,"r").read()
-		print(func.Performance(self.structureFound,benchmark))
+		# print(self.structureFound,"\t",totalEnergy)
+		benchmark = open(path+"benchmark/"+fileName,"r").read()
+
+		sen,sp,f_m,tp,fp,fn = func.Performance(self.structureFound,benchmark)
+		return sen,sp,f_m,tp,fp,fn,self.structureFound,totalEnergy
 
 		
 	# end function
@@ -523,7 +549,7 @@ class CRO():
 						else:
 							break
 						k = k+1
-					if(count>3):
+					if(count>2):
 						info.append((j,i,count))  # start, end, length
 
 		# sort info table
@@ -728,7 +754,7 @@ class CRO():
         # endfor
 
         # Pseudoknot energy
-		pkEnergy = pk.PseudoknotHandler(pkElements)
+		pkEnergy = pk.PseudoknotHandler(scElements,pkElements,sequence)
 	
 		return turnerEnergy
 

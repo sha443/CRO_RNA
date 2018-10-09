@@ -144,12 +144,15 @@ class Function():
 		    
 		        false_positive_basepair+=1
 
-		sensitivity =( true_basepair/ (true_basepair + false_negative_basepair))*100.0
-		specificity =( true_basepair / (true_basepair + false_positive_basepair))*100.0
-		a, c
-		a = sensitivity * specificity * 2
-		c = sensitivity + specificity
-		f_measure = a / c
+		# Avoid zero division 
+		if(true_basepair>0):
+			sensitivity =( true_basepair/ (true_basepair + false_negative_basepair))*100.0
+			specificity =( true_basepair / (true_basepair + false_positive_basepair))*100.0
+			a, c
+			a = sensitivity * specificity * 2
+			c = sensitivity + specificity
+			f_measure = a / c
+		# endif
 
 		return sensitivity,specificity,f_measure,true_basepair,false_positive_basepair,false_negative_basepair
     #End

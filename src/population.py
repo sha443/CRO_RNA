@@ -455,16 +455,18 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         # print(PrintableMolecule(mol3),"mol4")
 
         # Energy evaluation
-
         turnerEnergy = 0
         for stem in scElements:
             turnerEnergy+= energy.Turner04Handlar(stem,sequence)
         # endfor
 
         # Pseudoknot energy
+        pkEnergy = 0
         if(pkElements):
-            pkEnergy = pk.PseudoknotHandler(pkElements)
+            pkEnergy = pk.PseudoknotHandler(scElements,pkElements,sequence)
             # print(pkEnergy)
+
+        totalEnergy = turnerEnergy+pkEnergy
 
         # Compute stemPool
         temp = []
@@ -494,7 +496,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             moleculeShort.append(molShort)
             moleculeTable.append(moleculeSequence)
             elements.append(scElements)
-            molecule_energy.append(turnerEnergy)
+            molecule_energy.append(totalEnergy)
 
             test+=1
         # endif

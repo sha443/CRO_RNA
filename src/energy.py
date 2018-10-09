@@ -34,6 +34,9 @@ loop3_dic_cc ={
 
 # l_min dictionary for given stem length S1
 # stemlength1 : (l_min, a, b, c)
+
+# S1 for L1 and S2 for L1 [CC06 eqn. 4] 
+
 lmin_S1 ={
 2:  (4,0.95,1.84,-0.67),  3: (2,0.32,1.92,-3.9),   4: (3,1.77,1.82,-5.76), 5: (4,3.99,1.55,-5.86),
 6:  (4,7.73,1.29,-12.67), 7: (5,8.38,1.16,-11.45), 8: (5,4.52,1.61,-7.58), 9: (6,9.05,1.15,-11.45),
@@ -58,21 +61,22 @@ stack_dic ={
 #===================================================================================
 # Cao Chen 09 Energy Model
 #===================================================================================
-def CC06(pkCC06,stem_dic,stems_shortened_dic,seq):
+def CC06(pkCC06,seq):
 	CC06Result = {}
 	entropy_l1, entropy_l3 = 0.0, 0.0
 	for pkStem in pkCC06:
 		i, j, k, l, stemlength1, stemlength2, l1, l2, l3 = pkStem
+		index = i, j, k, l, stemlength1, stemlength2, l1, l2, l3 
 		stem1 = i, j
 		stem1_short = i, j, stemlength1
 		stack_s1, stack_s2 = 0,0
 
-		stack_s1 = wStack(stem1, stem1_short, stems_shortened_dic, stem_dic)
+		stack_s1 = wStack(stem1_short,seq)
 		         
 		stem2 = k, l
 		stem2_short = k, l, stemlength2
 
-		stack_s2 = wStack(stem2, stem2_short, stems_shortened_dic, stem_dic)    
+		stack_s2 = wStack(stem2_short,seq)    
 
 		l1 = k - (i + stemlength1)
 		l2 = (j - stemlength1 + 1) - (k + stemlength2)            
@@ -101,7 +105,12 @@ def CC06(pkCC06,stem_dic,stems_shortened_dic,seq):
 		    ln_w_coil = 2.14 * l1 + 0.10
 		    fitting = lmin_S2[stemlength2]
 		    l_min = fitting[0]
-		    ln_w = fitting[1] * math.log(l1 - l_min + 1) + fitting[2] * (l1 - l_min + 1) + fitting[3]
+		    # print(l1 - l_min + 1, l1,l_min,stemlength2)
+		    # Occurs error due to stem length==2 for pseudoknot
+		    logVal = l1 - l_min + 1
+		    if(logVal<1):
+		    	logVal = 1;
+		    ln_w = fitting[1] * math.log(logVal) + fitting[2] * (l1 - l_min + 1) + fitting[3]
 		    entropy_l1 = 0.62*(ln_w_coil - ln_w)
 		# endif
 
@@ -114,29 +123,30 @@ def CC06(pkCC06,stem_dic,stems_shortened_dic,seq):
 		    ln_w_coil = 2.14 * l3 + 0.10
 		    fitting = lmin_S1[stemlength1]
 		    l_min = fitting[0]
-		    ln_w = fitting[1] * math.log(l3 - l_min + 1) + fitting[2] * (l3 - l_min + 1) + fitting[3]
+		    logVal = l3 - l_min + 1
+		    if(logVal<1):
+		    	logVal = 1;
+		    ln_w = fitting[1] * math.log(logVal) + fitting[2] * (l3 - l_min + 1) + fitting[3]
 		    entropy_l3 = 0.62*(ln_w_coil - ln_w)
 		# endif
 
 		# Calculate free energy for pseudoknot
-		pk_energy = stack_s1 + stack_s2 - (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
+		# We want the loop entropy to be negative, hence + instead of - of the equation
+		pk_energy = stack_s1 + stack_s2 + (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
 		# standard 0.0
 		if pk_energy < 0.0:
-		    CC06Result[pkStem] = pk_energy #, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 
+		    CC06Result[index] = pk_energy #, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 
 		# endif
 
 	return CC06Result 
 	# endfor
 # end function
 
-def wStack(stem, stem_short, stems_shortened_dic, stem_list):
-	if stem_short in stems_shortened_dic:    # Look up whether S1 is a shortened stem
-		stack = stems_shortened_dic[stem_short][0]
-	else:     
-		stack = FindLength(stem_list,stem[0],stem[1])
-	    # stack = stem_list[len]
+def wStack(stem,seq):
+	stack = Turner04Handlar(stem,seq)
 	return stack
 # end function
+
 def FindLength(fromList,searchBy1,searchby2):
 
 	for stem in range(len(fromList)):
@@ -144,7 +154,9 @@ def FindLength(fromList,searchBy1,searchby2):
 		if(i==searchBy1 and j==searchby2):
 			return l
 		# endif
-	# endif
+	# endfor
+	# for noneType avoiding
+	return 0
 # end function
 def CoaxialStackingCalculation(seq, stemlength1, stemlength2, i, j, k, l):
 
@@ -176,7 +188,7 @@ def CoaxialStackingCalculation(seq, stemlength1, stemlength2, i, j, k, l):
 #===================================================================================
 # Cao Chen 09 Energy Model
 #===================================================================================
-def CC09(pk_dic_cc09, stem_dic):
+def CC09(pk_dic_cc09, stemList):
 	pk_dic_cc09_result = {}
 	entropies_dic, entropies_dic_L1, entropies_dic_L3 = {}, {}, {}    
 
@@ -210,12 +222,12 @@ def CC09(pk_dic_cc09, stem_dic):
 		i, j, k, l = pk_stem[0], pk_stem[1], pk_stem[2], pk_stem[3]
 
 		stemlength1 = pk_stem[4]
-		stack_s1 = FindLength(stem_dic,i,j)
-		energy_s1 = 0# stem_dic[stem1][3]        
+		stack_s1 = FindLength(stemList,i,j)
+		energy_s1 = 0# stemList[stem1][3]        
 		    
 		stemlength2 = pk_stem[5]  
-		stack_s2 = FindLength(stem_dic,k,l)
-		energy_s2 = 0# stem_dic[stem2][3]    
+		stack_s2 = FindLength(stemList,k,l)
+		energy_s2 = 0# stemList[stem2][3]    
 		                        
 		l1 = k - (i + stemlength1)
 		l2 = (j - stemlength1 + 1) - (k + stemlength2)            
@@ -255,34 +267,27 @@ def CC09(pk_dic_cc09, stem_dic):
 		    
 		if entropy:
 		    pk_energy = stack_s1 + stack_s2 - (0.62 * entropy)
-		    if pk_energy < 0.0: 
-		        pk_dic_cc09_result[pk_stem] = pk_energy #, stack_s1, stack_s2, l1, l3, l2, 0.62 * entropy
+		    if pk_energy < 0.0:
+		        pk_dic_cc09_result[stemlength2] = pk_energy #, stack_s1, stack_s2, l1, l3, l2, 0.62 * entropy
+		    else:
+		    	pk_dic_cc09_result[stemlength2] = pk_energy
 	return pk_dic_cc09_result #, entropies_dic, entropies_dic_L1, entropies_dic_L3
 #===================================================================================
 # LongPK Energy Model
 #===================================================================================
-def LongPK(pk_dic_longpk, stem_dic, INIT, PENALTY):
-    """ Function: dic_longpks()
+def LongPK(pk_dic_longpk, stemList, INIT, PENALTY):
 
-        Purpose:  Calculate pseudoknot free energies under energy model LongPK.
-                  Note that no shortened stems will occur here. 
-                  
-        Input:    Dictionary with pseudoknots where L2 >= 7.
-        
-        Return:   Dictionary with pseudoknots and associated free energy. 
-
-    """    
     pk_dic_longpk_result = {}    
 
     for pk_stem in pk_dic_longpk:
-
-        i, j, k, l = pk_stem[0], pk_stem[1], pk_stem[2], pk_stem[3]        
-      
         stemlength1 = pk_stem[4]
-        stack_s1 = FindLength(stem_dic,i,j)
+        i, j, k, l = pk_stem[0], pk_stem[1], pk_stem[2], pk_stem[3]
+        i, j, k, l, stemlength1, stemlength2, l1, l2, l3 = pk_stem
+        index = i, j, k, l, stemlength1, stemlength2, l1, l2, l3
+        stack_s1 = FindLength(stemList,i,j)
                                                     
         stemlength2 = pk_stem[5]
-        stack_s2 = FindLength(stem_dic,k,l)    
+        stack_s2 = FindLength(stemList,k,l)    
           
         l1 = k - (i + stemlength1)
         l2 = (j - stemlength1 + 1) - (k + stemlength2) 
@@ -295,7 +300,7 @@ def LongPK(pk_dic_longpk, stem_dic, INIT, PENALTY):
         pk_energy = stack_s1 + stack_s2 - entropy
       
         if pk_energy < 0.0:            
-            pk_dic_longpk_result[pk_stem] = pk_energy #, stack_s1, stack_s2, l1, l2, l3, entropy, looplength
+            pk_dic_longpk_result[index] = pk_energy #, stack_s1, stack_s2, l1, l2, l3, entropy, looplength
                 
     return pk_dic_longpk_result
 

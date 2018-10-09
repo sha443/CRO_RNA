@@ -140,6 +140,30 @@ class Operators():
         #         unique.append(n)
         # return unique
         return molecule
+    # end function
+
+    def RepairKHP(self,infoTable):
+        removeIndex = []
+        size = len(infoTable)
+        for index in range(size):
+            start,end,length = infoTable[index]
+            khp = ((end-length+1) - (start+length))
+            if(khp<1):
+                # infoTable.remove(infoTable[index])
+                removeIndex.append(index)
+                # size-=1
+                # print(size,"new size")
+            # endif
+        # Endfor
+
+        removeIndex.sort(reverse=True)
+        for i in range(len(removeIndex)):
+            # print(removeIndex[i])
+            infoTable.remove(infoTable[removeIndex[i]])
+        # endfor
+        return infoTable
+    # end function
+# end class
 
 ######################################################################
 #Module Test
@@ -152,3 +176,41 @@ class Operators():
 # op.Decomposition(mol)
 # op.Intermolecular(mol,mol2)
 # op.Synthesis(mol,mol2)
+
+
+infoTable = [(7, 22, 7), 
+(19, 41, 6), 
+(14, 44, 5), 
+(28, 40, 5), 
+(18, 37, 5), 
+(10, 44, 4), 
+(21, 43, 4), 
+(16, 38, 4), 
+(21, 32, 4), 
+(0, 29, 4), 
+(13, 21, 4), 
+(2, 14, 4), 
+(35, 44, 3), 
+(3, 42, 3),
+(3, 38, 3), 
+(6, 37, 3),
+(24, 37, 3),
+(28, 35, 3),
+(3, 31, 3),
+(16, 31, 3),
+(7, 30, 3), 
+(19, 30, 3), 
+(25, 30, 3), 
+(2, 29, 3), 
+(12, 28, 3), 
+(20, 27, 3), 
+(3, 23, 3), 
+(16, 23, 3), 
+(10, 20, 3), 
+(9, 19, 3), 
+(14, 19, 3), 
+(3, 17, 3), 
+(0, 14, 3)]
+# print(infoTable,"befor")
+# newTable = Operators().RepairKHP(infoTable)
+# print(newTable,"after")
