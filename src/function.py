@@ -143,6 +143,13 @@ class Function():
 		    if ((predicted[i]=='(' or predicted[i]=='[' or predicted[i]=='{') and (benchmark[i] !='(' and benchmark[i] !='[' and benchmark[i] !='{')):
 		    
 		        false_positive_basepair+=1
+		    # endif
+		# endfor
+
+		# Avoid null
+		sensitivity = 0
+		specificity = 0
+		f_measure = 0
 
 		# Avoid zero division 
 		if(true_basepair>0):

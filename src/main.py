@@ -6,7 +6,7 @@ from function import Function as func
 from molecule import Molecule
 from cro import CRO
 import tictoc
-
+import sqlite
 
 class main():
 	def run(self,filename,path):
@@ -67,34 +67,46 @@ class main():
 		# print(func.Performance(predicted,benchmark))
 		# print(mole.elements[minIndex])
 
-
-		#----------------------------------------------------------------------------------------------
-		# Initial INN-HB energy calculation
-		#----------------------------------------------------------------------------------------------
-		# Unique stemlist energy
-		# Sorted by energy in ascending order
-		# basePairsEnergy = energy.Turner04Handlar(mole.basePairs,sequence)
-		# print(basePairsEnergy)
 		#----------------------------------------------------------------------------------------------
 		# Optimize with CRO
 		#----------------------------------------------------------------------------------------------
 		C  = CRO()
 		# C.Init(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole)
-		C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path,filename)
-
+		sen,sp,f_m,tp,fp,fn = C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path,filename)
+		return sen,sp,f_m,tp,fp,fn
 	# end function
 # end class
 
 
 #-----------------------------------------------------------------------------------------
+# Test area
+#-----------------------------------------------------------------------------------------
+path = "../data/ipknot/"
+filename = "PKB40.txt" # Manual input
+sen,sp,f1,tp,fp,fn = main().run(filename,path)
 
-path = "../data/sa/"
-filename = "Ec_PK3.txt" # Manual input
-main().run(filename,path)
-
+#-----------------------------------------------------------------------------------------
+# Command line processing area
+#-----------------------------------------------------------------------------------------
 # commandline = sys.argv
 # print(commandline[1])
 # # print(commandline[2])
 # file = open('log.txt')
 # file.write('Hwl')
 # main().run(commandline[1],path)
+
+#-----------------------------------------------------------------------------------------
+# Database processing area [Only for ipknot dataset]
+#-----------------------------------------------------------------------------------------
+res = sqlite.fetchDB(filename)
+if(res==-1):
+	# No entry, insertDB
+	sqlite.insertDB(filename,sen,sp,f1,tp,fp,fn)
+else:
+	# Check if we have a better output
+	if(res<f1):
+		sqlite.updateDB(filename,sen,sp,f1,tp,fp,fn)
+	# enfif
+# endif
+print("Average Performance:")
+print(sqlite.performanceDB())

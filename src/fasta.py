@@ -7,7 +7,7 @@ def fasta(commandline):
 	lines = []              # Store ids and sequences in list
 	input_list = []
 	fasta_file = commandline[1]
-	f = open(fasta_file,'U')
+	f = open(fasta_file,"U")
 	for line in f:                                  
 		if line:
 			lines.append(line) 
@@ -25,10 +25,9 @@ def fasta(commandline):
 # end function
 
 
-path = '../data/ga/'
-fastaFiles = os.listdir(path+'input')
+path = 'E:\HelloWorld\RNA\Daatasets\Datasets-master\Datasets-master\input\ipknot/'
+fastaFiles = os.listdir(path)
 for file in fastaFiles:
 	print(file)
-	m = main()
-	m.run(file,path)
-	# call("python main.py "+file+" "+path,shell=True)
+	fasta(file)
+# endfor

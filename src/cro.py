@@ -294,6 +294,7 @@ class CRO():
 		print([sen,sp,f_m])
 		print([structureFound,totalEnergy])
 
+		return sen,sp,f_m,tp,fp,fn
 
 	#end function
 
