@@ -21,7 +21,7 @@ class main():
 		
 		# Parameters
 		iteration = 10
-		popSize = 10
+		popSize = 20
 		KELossRate= 0.8
 		MoleColl= 0.5
 		InitialKE= 0
@@ -81,10 +81,10 @@ class main():
 #-----------------------------------------------------------------------------------------
 # Test area
 #-----------------------------------------------------------------------------------------
-path = "../data/ipknot/"
-filename = "PKB40.txt" # Manual input
+db = "../data/database/preAlgorithm.db"
+path = "../data/preAlgorithm/"
+filename = "BMV.txt" # Manual input
 sen,sp,f1,tp,fp,fn = main().run(filename,path)
-
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
@@ -96,17 +96,18 @@ sen,sp,f1,tp,fp,fn = main().run(filename,path)
 # main().run(commandline[1],path)
 
 #-----------------------------------------------------------------------------------------
-# Database processing area [Only for ipknot dataset]
+# Database processing area
 #-----------------------------------------------------------------------------------------
-res = sqlite.fetchDB(filename)
+res = sqlite.fetchDB(db,filename)
 if(res==-1):
 	# No entry, insertDB
-	sqlite.insertDB(filename,sen,sp,f1,tp,fp,fn)
+	sqlite.insertDB(db,filename,sen,sp,f1,tp,fp,fn)
 else:
 	# Check if we have a better output
 	if(res<f1):
-		sqlite.updateDB(filename,sen,sp,f1,tp,fp,fn)
+		sqlite.updateDB(db,filename,sen,sp,f1,tp,fp,fn)
 	# enfif
 # endif
+print("---------------------------------------------------------------")
 print("Average Performance:")
-print(sqlite.performanceDB())
+print(sqlite.performanceDB(db))

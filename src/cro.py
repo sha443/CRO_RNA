@@ -356,11 +356,8 @@ class CRO():
 					# endwhile
 
 					# Revoke if not found enough stems
-					# Or like this :-P   ...((()))..
-                    # Leave out kissing hairpin loop
-					f,t = startPair
-					khp = ((t-stem+1) - (f+stem))
-					if(stem<3 and stem>0 or (khp==0 and stem<4)):
+		
+					if(stem<3 and stem>0):
 						f,t = startPair
 						for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
 							flag[x] = 0
@@ -372,11 +369,6 @@ class CRO():
 					# Else add to mol and info
 					else:
 						f,t = startPair
-						# Leave khp first then bond
-						if(khp==0):
-							stem-= 1
-                        # endif
-
 						scElements.append([f,t,stem]) # start,end,length
 						for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 							flag[x] = 1

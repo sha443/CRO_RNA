@@ -1,23 +1,23 @@
 import sqlite3
 
-def insertDB(filename,sen,sp,f1,tp,fp,fn):
-	conn = sqlite3.connect('ipknot.db')
+def insertDB(db,filename,sen,sp,f1,tp,fp,fn):
+	conn = sqlite3.connect(db)
 	c = conn.cursor()
 	c.execute("INSERT INTO performance VALUES('%s',%.2f,%.2f,%.2f,%d,%d,%d)" % (filename,sen,sp,f1,tp,fp,fn))
 	conn.commit()
 	conn.close()
 # end function
 
-def updateDB(filename,sen,sp,f1,tp,fp,fn):
-	conn = sqlite3.connect('ipknot.db')
+def updateDB(db,filename,sen,sp,f1,tp,fp,fn):
+	conn = sqlite3.connect(db)
 	c = conn.cursor()
 	c.execute("UPDATE performance  SET Sen = %.2f, Sp = %.2f, F1 = %.2f, Tp = %d, Fp = %d, Fn = %d WHERE Filename = '%s'" % (float(sen),float(sp),float(f1),tp,fp,fn,filename))
 	conn.commit()
 	conn.close()
 # end function
 
-def fetchDB(filename):
-	conn = sqlite3.connect('ipknot.db')
+def fetchDB(db,filename):
+	conn = sqlite3.connect(db)
 	c = conn.cursor()
 	c.execute("SELECT * FROM performance WHERE Filename = '%s'" % filename)
 	data = c.fetchone()
@@ -29,10 +29,10 @@ def fetchDB(filename):
 	else:
 		return -1
 # end function
-def performanceDB():
-	conn = sqlite3.connect('ipknot.db')
+def performanceDB(db):
+	conn = sqlite3.connect(db)
 	c = conn.cursor()
-	c.execute("select avg(Sen),avg(Sp), avg(F1) from performance")
+	c.execute("SELECT AVG(Sen), AVG(Sp), AVG(F1) FROM performance")
 	data = c.fetchone()
 	
 	if(data):

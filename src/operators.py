@@ -149,18 +149,15 @@ class Operators():
             start,end,length = infoTable[index]
             khp = ((end-length+1) - (start+length))
             if(khp<1):
-                # infoTable.remove(infoTable[index])
-                removeIndex.append(index)
-                # size-=1
-                # print(size,"new size")
+                # Cut 2nt
+                length = length-1
+                # print(infoTable[index])
+                infoTable[index] =  start,end,length
+                # print(infoTable[index])
+
+                # But length may less than 3 which is remained unchekced. Fix this later
             # endif
         # Endfor
-
-        removeIndex.sort(reverse=True)
-        for i in range(len(removeIndex)):
-            # print(removeIndex[i])
-            infoTable.remove(infoTable[removeIndex[i]])
-        # endfor
         return infoTable
     # end function
 # end class
