@@ -1,5 +1,7 @@
 import sqlite3
-
+#-----------------------------------------------------------------------------------------
+# Database opeation
+#-----------------------------------------------------------------------------------------
 def insertDB(db,filename,sen,sp,f1,tp,fp,fn):
 	conn = sqlite3.connect(db)
 	c = conn.cursor()
@@ -44,8 +46,40 @@ def performanceDB(db):
 	else:
 		return "No records found!"
 # end function
+def printTable(db):
+	conn = sqlite3.connect(db)
+	c = conn.cursor()
+	c.execute("SELECT * FROM performance")
+	for row in c:
+		for items in row:
+			print(items,end="\t")
+		# endfor
+		print("")
+	# endfor
 
-# insertDB("BaEV",100.0, 90.0, 95.0, 14.0, 3.0, 0.0)
+#-----------------------------------------------------------------------------------------
+# Database processing area
+#-----------------------------------------------------------------------------------------
+def helperDB(db,filename,sen,sp,f1,tp,fp,fn):
+	res = fetchDB(db,filename)
+	if(res==-1):
+		# No entry, insertDB
+		insertDB(db,filename,sen,sp,f1,tp,fp,fn)
+	else:
+		# Check if we have a better output
+		if(res<f1):
+			updateDB(db,filename,sen,sp,f1,tp,fp,fn)
+		# enfif
+	# endif
+	print("---------------------------------------------------------------")
+	print("Average Performance:")
+	print(performanceDB(db))
+	# printTable(db)
+# end function
+
+#-----------------------------------------------------------------------------------------
+# Test
+#-----------------------------------------------------------------------------------------# insertDB("BaEV",100.0, 90.0, 95.0, 14.0, 3.0, 0.0)
 # res = fetchDB('BEfdV')
 # print(res)
 # updateDB("BaEV",100.0, 80.0, 90.0, 14.0, 3.0, 3.0)

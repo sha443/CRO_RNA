@@ -81,10 +81,11 @@ class main():
 #-----------------------------------------------------------------------------------------
 # Test area
 #-----------------------------------------------------------------------------------------
-db = "../data/database/preAlgorithm.db"
-path = "../data/preAlgorithm/"
-filename = "BMV.txt" # Manual input
+db = "../data/database/ipknot.db"
+path = "../data/ipknot/"
+filename = "PKB26.txt" # Manual input
 sen,sp,f1,tp,fp,fn = main().run(filename,path)
+sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
@@ -95,19 +96,4 @@ sen,sp,f1,tp,fp,fn = main().run(filename,path)
 # file.write('Hwl')
 # main().run(commandline[1],path)
 
-#-----------------------------------------------------------------------------------------
-# Database processing area
-#-----------------------------------------------------------------------------------------
-res = sqlite.fetchDB(db,filename)
-if(res==-1):
-	# No entry, insertDB
-	sqlite.insertDB(db,filename,sen,sp,f1,tp,fp,fn)
-else:
-	# Check if we have a better output
-	if(res<f1):
-		sqlite.updateDB(db,filename,sen,sp,f1,tp,fp,fn)
-	# enfif
-# endif
-print("---------------------------------------------------------------")
-print("Average Performance:")
-print(sqlite.performanceDB(db))
+

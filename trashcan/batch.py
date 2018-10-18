@@ -1,8 +1,8 @@
 import os
-import main
 
-directory = 'E:\HelloWorld\RNA\RSPPk\data\input\short'
+
+directory = 'E:\HelloWorld\RNA\RSPPk\data\cro\input/'
 
 for fileName in os.listdir(directory):
 	print(fileName)
-	main.main(fileName)
+	# main.main(fileName)
