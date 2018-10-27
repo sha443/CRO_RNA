@@ -9,6 +9,8 @@ import tictoc
 import sqlite
 
 class main():
+	def __init__(self):
+		pass
 	def run(self,filename,path):
 		
 		file = open(path+"input/"+filename,"r",)
@@ -75,17 +77,30 @@ class main():
 		sen,sp,f_m,tp,fp,fn = C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path,filename)
 		return sen,sp,f_m,tp,fp,fn
 	# end function
+	def Test(self,filename):
+		print(filename,"problem")
+		db = "../data/database/ipknot.db"
+		path = "../data/ipknot/"
+		# filename = "PKB1.txt" # Manual input
+		sen,sp,f1,tp,fp,fn = main().run(filename,path)
+		sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
+# end
 # end class
 
 
 #-----------------------------------------------------------------------------------------
 # Test area
 #-----------------------------------------------------------------------------------------
-db = "../data/database/ipknot.db"
-path = "../data/ipknot/"
-filename = "PKB26.txt" # Manual input
-sen,sp,f1,tp,fp,fn = main().run(filename,path)
-sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
+def Test(filename):
+	print(filename,"problem")
+	db = "../data/database/ipknot.db"
+	path = "../data/ipknot/"
+	# filename = "PKB1.txt" # Manual input
+	sen,sp,f1,tp,fp,fn = main().run(filename,path)
+	sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
+# end
+# Test("PKB3.txt")
+
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
@@ -95,5 +110,3 @@ sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
 # file = open('log.txt')
 # file.write('Hwl')
 # main().run(commandline[1],path)
-
-
