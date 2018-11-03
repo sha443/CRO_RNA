@@ -32,6 +32,7 @@ def PseudoknotHandler(scElements,pkElements,seq):
     return ene
 # end function
 
+
 def LoopsFulfill(l1, l2, l3):
     loops_fulfilled = False
     
@@ -39,7 +40,7 @@ def LoopsFulfill(l1, l2, l3):
         if l2 >= L2_LOWER and l2 < L2_UPPER:                               
             if l3 >= L3_LOWER and l3 < L3_UPPER:
                 loops_fulfilled = True
-    
+    return True
     return loops_fulfilled
 # end function
 

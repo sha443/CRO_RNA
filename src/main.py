@@ -22,14 +22,14 @@ class main():
 		print(sequence)
 		
 		# Parameters
-		iteration = 10
+		iteration = 20
 		popSize = 20
-		KELossRate= 0.8
-		MoleColl= 0.5
+		KELossRate= 0.85
+		MoleColl= 0.30
 		InitialKE= 0
 		alpha = 1
-		beta = 5
-		buffer =0
+		beta = 10
+		buffer = 0
 
 		# Timer starts
 		tictoc.tic()
@@ -40,34 +40,22 @@ class main():
 		mole = Molecule()
 		mole.Mol(sequence, popSize, InitialKE)
 		
-		# Save initial informations
-		minEnergy = 99999
-		index = 0
-		minIndex = 0
-		initPop = open(path+"output/initial_population_"+filename,"a")
-		for molecule in mole.molecules:
-			# initPop.write(population.PrintableMolecule(molecule)
-			# initPop.write(str(mole.PE[index]))
-			# initPop.write("\n")
-			if(mole.moleculeEnergy[index]<minEnergy):
-				minIndex = index
-				minEnergy=mole.moleculeEnergy[index]
+		# # Save initial informations
+		# minEnergy = 99999
+		# index = 0
+		# minIndex = 0
+		# initPop = open(path+"output/initial_population_"+filename,"a")
+		# for molecule in mole.molecules:
+		# 	# initPop.write(population.PrintableMolecule(molecule)
+		# 	# initPop.write(str(mole.PE[index]))
+		# 	# initPop.write("\n")
+		# 	if(mole.moleculeEnergy[index]<minEnergy):
+		# 		minIndex = index
+		# 		minEnergy=mole.moleculeEnergy[index]
 
-			index+=1
-		# endfor
+		# 	index+=1
+		# # endfor
 		# initPop.write("\n")
-
-		# Initial Comparison
-		benchmark = open(path+"benchmark/"+filename,"r").read()
-		predicted = population.PrintableMolecule(mole.molecules[minIndex])
-		# print(predicted,end="\t")
-		# print(minEnergy)
-		# print("(sen, sp, f, tp, fp, fn)")
-		# print("==================================")
-		# print("Before CRO:")
-		# # sensitivity,specificity,f_measure,true_basepair,false_positive_basepair,false_negative_basepair
-		# print(func.Performance(predicted,benchmark))
-		# print(mole.elements[minIndex])
 
 		#----------------------------------------------------------------------------------------------
 		# Optimize with CRO
@@ -78,35 +66,18 @@ class main():
 		return sen,sp,f_m,tp,fp,fn
 	# end function
 	def Test(self,filename):
-		print(filename,"problem")
-		db = "../data/database/ipknot.db"
-		path = "../data/ipknot/"
+		db = "../data/database/sa.db"
+		path = "../data/sa/"
 		# filename = "PKB1.txt" # Manual input
 		sen,sp,f1,tp,fp,fn = main().run(filename,path)
 		sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
 # end
 # end class
 
-
-#-----------------------------------------------------------------------------------------
-# Test area
-#-----------------------------------------------------------------------------------------
-def Test(filename):
-	print(filename,"problem")
-	db = "../data/database/ipknot.db"
-	path = "../data/ipknot/"
-	# filename = "PKB1.txt" # Manual input
-	sen,sp,f1,tp,fp,fn = main().run(filename,path)
-	sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
-# end
-# Test("PKB3.txt")
+# main().Test("CrPV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-# commandline = sys.argv
-# print(commandline[1])
-# # print(commandline[2])
-# file = open('log.txt')
-# file.write('Hwl')
-# main().run(commandline[1],path)
+commandline = sys.argv
+main().Test(commandline[1])

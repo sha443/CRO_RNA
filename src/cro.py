@@ -306,6 +306,8 @@ class CRO():
 		moleculeSequence = []
 		scElements = []
 		pkElements = []
+
+		makePair = []
 		# Initialization
 		for i in range(len(mole.sequence)):
 			flag.append(0)
@@ -479,6 +481,101 @@ class CRO():
 				# end pseudo condition
 			# end for k,l, l2
 		# end for i,j,l1
+		# ======================================================
+        # Finding Recursive Pseudoknot
+        # ======================================================
+		mol4 = mol2[:]  # make a duplicate of molecule 2; mol3 is equal to mole2 at this time.
+		for i,j,len1 in tempInfo:
+		    for k,l,len2 in tempInfo:
+		        if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+		            # Pseudoknot info
+		            # Loop lenght calculation for energy evaluation 
+		            l1 = k - (i + len1)
+		            l2 = (j - len1 + 1) - (k + len2)
+		            l3 = (l - len2) - j
+		            if(pk.LoopsFulfill(l1, l2, l3)):
+		                # print(j,k,len2,"pk")
+
+		                # Search inside for making pk
+		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+		                    if(flag[u]==0 and flag[v]==0):
+		                        flag[u] = 3
+		                        flag[v] = 3
+		                        flagValid[u] = 5 # {
+		                        flagValid[v] = 6 # }
+		                    # endif
+		                # endfor
+
+		                # Search for 2 or more bp for making pk
+		                startPk = None
+		                endPk = None
+
+		                for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
+		                    # Checy if first valid bond is found
+		                    stem = 0
+		                    if(flag[u]==3 and flag[v]==3):
+		                        startPair = (u,v)
+		                        uu = u
+		                        vv = v
+		                        while(flag[u]==3 and flag[v]==3 and u<=v):
+		                            
+		                            # Check if it is still valid counting the future stem
+		                            l1 = uu - (i + len1)
+		                            l2 = (j - len1 + 1) - (uu + stem+1)
+		                            l3 = (vv - stem-1) - j
+		                            stillValid = pk.LoopsFulfill(l1, l2, l3)
+		                            if(stillValid):
+		                                stem+=1
+		                                u+=1
+		                                v-=1
+		                                # May not needed
+		                                endPair = (u,v)
+		                            else:
+		                                break
+		                        # endwhile
+
+		                        
+		                        # Revoke if not found enough stems (at least 2)
+		                        if(stem<2 and stem>0): # or (not stillValid)
+		                            f,t = startPair
+		                            for x,y in zip(range(f,f+stem,1),range(t,t-stem,-1)):
+		                                flag[x] = 0
+		                                flag[y] = 0
+		                                flagValid[x] = 0
+		                                flagValid[y] = 0
+		                            # endfor
+
+		                        # add to mol and info
+		                        elif(stillValid):
+		                            f,t = startPair
+		                            # print(i,j,f,t,len1,stem,l1,l2,l3)
+		                            pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
+		                            scElements.append([f,t,stem])
+		                            for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
+		                                flag[x] = 1
+		                                flag[y] = 1
+		                                mol4[x] = "{"
+		                                mol4[y] = "}"
+
+		                                # Must be removed later
+		                                infoEnergy.append((x,y))
+		                                makePair.append((x,y))
+		                            # endfor
+		                        # endif stem
+
+		                    # endif
+		                # Endfor u,v
+		            # Endif LoopsFulfill
+		        # endif pseudo condition
+		    # end for k,l, l2
+		# end for i,j,l1
+
+		if(mol4!=mol2):
+		    print(PrintableMolecule(mol2),"mol2")
+		    print(PrintableMolecule(mol4),"mol4")
+		    # Found helpful
+		# endif
+
 		# Energy evaluation
 		turnerEnergy = 0
 		for stem in scElements:
@@ -493,7 +590,7 @@ class CRO():
 
 		totalEnergy = turnerEnergy+pkEnergy
 
-		self.structureFound = population.PrintableMolecule(mol2)
+		self.structureFound = population.PrintableMolecule(mol4)
 		# print(self.structureFound,"\t",totalEnergy)
 		benchmark = open(path+"benchmark/"+fileName,"r").read()
 

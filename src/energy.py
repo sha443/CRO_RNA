@@ -1,6 +1,6 @@
 import math
 import os
-
+accEne = 0.0
 # Loop entropy for loop L1 and stem S2 (deep groove)
 # First entry is loop size, second entry is stem size    
 loop1_dic_cc ={
@@ -134,7 +134,7 @@ def CC06(pkCC06,seq):
 		# We want the loop entropy to be negative, hence + instead of - of the equation
 		pk_energy = stack_s1 + stack_s2 + (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
 		# standard 0.0
-		if pk_energy < 0.0:
+		if pk_energy < accEne:
 		    CC06Result[index] = pk_energy #, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 
 		# endif
 
@@ -267,7 +267,7 @@ def CC09(pk_dic_cc09, stemList):
 		    
 		if entropy:
 		    pk_energy = stack_s1 + stack_s2 - (0.62 * entropy)
-		    if pk_energy < 0.0:
+		    if pk_energy < accEne:
 		        pk_dic_cc09_result[stemlength2] = pk_energy #, stack_s1, stack_s2, l1, l3, l2, 0.62 * entropy
 		    else:
 		    	pk_dic_cc09_result[stemlength2] = pk_energy
@@ -299,7 +299,7 @@ def LongPK(pk_dic_longpk, stemList, INIT, PENALTY):
         # delG = wS1 + wS2 - delTLooplength
         pk_energy = stack_s1 + stack_s2 - entropy
       
-        if pk_energy < 0.0:            
+        if pk_energy < accEne:            
             pk_dic_longpk_result[index] = pk_energy #, stack_s1, stack_s2, l1, l2, l3, entropy, looplength
                 
     return pk_dic_longpk_result
