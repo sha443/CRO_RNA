@@ -1,0 +1,20 @@
+IpKnot:
+Sen = 80.6
+Sp  = 75.1
+F1  = 77.0
+
+GAKnot:
+Sen = 81.6
+Sp  = 75.1
+F1  = 78.2
+
+GA:
+Sen = 94.5
+Sp  = 80.0
+F1  = 86.87
+
+Simulated Annealing:
+Sen = 92.61
+Sp  = 84.34
+F1  = 88.28
+

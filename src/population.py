@@ -191,6 +191,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         for i,j,len1 in infoTable:
             for k,l,len2 in infoTable:
                 if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
+
                     # Pseudoknot info
                     # Loop lenght calculation for energy evaluation 
                     l1 = k - (i + len1)
@@ -355,7 +356,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         # Finding Recursive Pseudoknot
         # ======================================================
         mol4 = mol2[:]  # make a duplicate of molecule 2; mol3 is equal to mole2 at this time.
-        for i,j,len1 in scElements:
+        for i,j,len1 in infoTable:
             for k,l,len2 in infoTable:
                 if(i<k and k<j and j<l):   # condiiton for H-type Pseudoknot
                     # Pseudoknot info
@@ -383,11 +384,11 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                         for u,v in zip(range(k,k+len2,1),range(l,0,-1)):
                             # Checy if first valid bond is found
                             stem = 0
-                            if(flag[u]==3 and flag[v]==3 and Equal56(flagValid,u,v)):
+                            if(flag[u]==3 and flag[v]==3):
                                 startPair = (u,v)
                                 uu = u
                                 vv = v
-                                while(flag[u]==3 and flag[v]==3 and Equal56(flagValid,u,v) and u<=v):
+                                while(flag[u]==3 and flag[v]==3 and u<=v):
                                     
                                     # Check if it is still valid counting the future stem
                                     l1 = uu - (i + len1)
@@ -440,9 +441,13 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
             # end for k,l, l2
         # end for i,j,l1
 
+        # print(PrintableMolecule(mol3),"mol2")
 
-        # print(PrintableMolecule(mol2),"mol2")
-        # print(PrintableMolecule(mol3),"mol4")
+        # if(mol4!=mol2):
+        #     print(PrintableMolecule(mol3),"mol2")
+        #     print(PrintableMolecule(mol4),"mol4")
+        #     # Found helpful
+        # # endif
 
         # Energy evaluation
         turnerEnergy = 0

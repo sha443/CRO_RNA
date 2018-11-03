@@ -144,6 +144,20 @@ class Function():
 		    
 		        false_positive_basepair+=1
 		    # endif
+
+		    # CLosing check
+		    # if ((predicted[i] == ')' or predicted[i] == ']' or predicted[i] == '}') and (benchmark[i] == ')' or benchmark[i] == ']' or benchmark[i] == '}')):
+		    
+		    #     true_basepair+=1
+		    
+		    # if ((predicted[i] != ')' and predicted[i] != ']' and predicted[i] != '}') and (benchmark[i] == ')' or benchmark[i] == ']' or benchmark[i] == '}')):
+		    
+		    #     false_negative_basepair+=1
+		    
+		    # if ((predicted[i]==')' or predicted[i]==']' or predicted[i]=='}') and (benchmark[i] !=')' and benchmark[i] !=']' and benchmark[i] !='}')):
+		    
+		    #     false_positive_basepair+=1
+		    # endif
 		# endfor
 
 		# Avoid null
