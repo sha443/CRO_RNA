@@ -287,14 +287,14 @@ class CRO():
 		energyAfter.write(outputString)
 		strucreNenergy = structureFound+"\t%.2f" % (totalEnergy)
 		energyAfter.write(strucreNenergy)
-		energyAfter.write("\n"+tm)
+		energyAfter.write("\nElapsed time "+tm+" sec")
 		
 		# Log:
 		print("[sen,sp,f-measure]")
 		print([sen,sp,f_m])
 		print([structureFound,totalEnergy])
 
-		return sen,sp,f_m,tp,fp,fn
+		return sen,sp,f_m,tp,fp,fn,tm,totalEnergy
 
 	#end function
 

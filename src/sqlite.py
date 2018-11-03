@@ -2,18 +2,18 @@ import sqlite3
 #-----------------------------------------------------------------------------------------
 # Database opeation
 #-----------------------------------------------------------------------------------------
-def insertDB(db,filename,sen,sp,f1,tp,fp,fn):
+def insertDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene):
 	conn = sqlite3.connect(db)
 	c = conn.cursor()
-	c.execute("INSERT INTO performance VALUES('%s',%.2f,%.2f,%.2f,%d,%d,%d)" % (filename,sen,sp,f1,tp,fp,fn))
+	c.execute("INSERT INTO performance VALUES('%s',%.2f,%.2f,%.2f,%d,%d,%d,%.2f,%.2f)" % (filename,sen,sp,f1,tp,fp,fn,time,ene))
 	conn.commit()
 	conn.close()
 # end function
 
-def updateDB(db,filename,sen,sp,f1,tp,fp,fn):
+def updateDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene):
 	conn = sqlite3.connect(db)
 	c = conn.cursor()
-	c.execute("UPDATE performance  SET Sen = %.2f, Sp = %.2f, F1 = %.2f, Tp = %d, Fp = %d, Fn = %d WHERE Filename = '%s'" % (float(sen),float(sp),float(f1),tp,fp,fn,filename))
+	c.execute("UPDATE performance  SET Sen = %.2f, Sp = %.2f, F1 = %.2f, Tp = %d, Fp = %d, Fn = %d, ET= %.2f, Ene= %.2f WHERE Filename = '%s'" % (float(sen),float(sp),float(f1),tp,fp,fn,float(time),float(ene),filename))
 	conn.commit()
 	conn.close()
 # end function
@@ -60,15 +60,15 @@ def printTable(db):
 #-----------------------------------------------------------------------------------------
 # Database processing area
 #-----------------------------------------------------------------------------------------
-def helperDB(db,filename,sen,sp,f1,tp,fp,fn):
+def helperDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene):
 	res = fetchDB(db,filename)
 	if(res==-1):
 		# No entry, insertDB
-		insertDB(db,filename,sen,sp,f1,tp,fp,fn)
+		insertDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene)
 	else:
 		# Check if we have a better output
 		if(res<f1):
-			updateDB(db,filename,sen,sp,f1,tp,fp,fn)
+			updateDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene)
 		# enfif
 	# endif
 	print("---------------------------------------------------------------")

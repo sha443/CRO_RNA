@@ -62,22 +62,25 @@ class main():
 		#----------------------------------------------------------------------------------------------
 		C  = CRO()
 		# C.Init(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole)
-		sen,sp,f_m,tp,fp,fn = C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path,filename)
-		return sen,sp,f_m,tp,fp,fn
+		sen,sp,f_m,tp,fp,fn,time,ene = C.CRO(popSize, KELossRate, MoleColl, InitialKE, alpha, beta, buffer, sequence, mole,iteration,path,filename)
+		return sen,sp,f_m,tp,fp,fn,time,ene
 	# end function
 	def Test(self,filename):
-		db = "../data/database/sa.db"
-		path = "../data/sa/"
+		db = "../data/database/cro.db"
+		path = "../data/cro/"
 		# filename = "PKB1.txt" # Manual input
-		sen,sp,f1,tp,fp,fn = main().run(filename,path)
-		sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn)
+		sen,sp,f1,tp,fp,fn,time,ene = main().run(filename,path)
+		time = float(time)
+		ene = float(ene)
+
+		sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene)
 # end
 # end class
 
-# main().Test("CrPV.txt")
+main().Test("BChV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-commandline = sys.argv
-main().Test(commandline[1])
+# commandline = sys.argv
+# main().Test(commandline[1])
