@@ -572,9 +572,9 @@ class CRO():
 		    # end for k,l, l2
 		# end for i,j,l1
 
-		if(mol4!=mol2):
-		    print(PrintableMolecule(mol2),"mol2")
-		    print(PrintableMolecule(mol4),"mol4")
+		# if(mol4!=mol2):
+		#     print(PrintableMolecule(mol2),"mol2")
+		#     print(PrintableMolecule(mol4),"mol4")
 		    # Found helpful
 		# endif
 

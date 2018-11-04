@@ -22,8 +22,8 @@ class main():
 		print(sequence)
 		
 		# Parameters
-		iteration = 70
-		popSize = 50
+		iteration = 10
+		popSize = 20
 		KELossRate= 0.85
 		MoleColl= 0.30
 		InitialKE= 0
@@ -66,21 +66,24 @@ class main():
 		return sen,sp,f_m,tp,fp,fn,time,ene
 	# end function
 	def Test(self,filename):
-		db = "../data/database/ipknot.db"
-		path = "../data/ipknot/"
+		path = "../data/sa/"
+		table = "sa"
 		# filename = "PKB1.txt" # Manual input
 		sen,sp,f1,tp,fp,fn,time,ene = main().run(filename,path)
 		time = float(time)
 		ene = float(ene)
 
-		sqlite.helperDB(db,filename,sen,sp,f1,tp,fp,fn,time,ene)
+		sqlite.helperDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene)
 # end
 # end class
 
-# main().Test("Sars-CoV.txt")
+#-----------------------------------------------------------------------------------------
+# Manual test area
+#-----------------------------------------------------------------------------------------
+main().Test("VMV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-commandline = sys.argv
-main().Test(commandline[1])
+# commandline = sys.argv
+# main().Test(commandline[1])
