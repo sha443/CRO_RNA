@@ -37,7 +37,7 @@ def Checkerboard(sequence):
 # end function
 
 # Finding consecutive 4 or more diagonal 1's in board
-def FindDiagonal(sequence,dotplot):
+def FindDiagonal(sequence,dotplot,minStem):
     info = []
     infoTable = []
 
@@ -53,7 +53,7 @@ def FindDiagonal(sequence,dotplot):
                     else:
                         break
                     k = k+1
-                if(count>2):
+                if(count>minStem):
                     info.append((j,i,count))  # start, end, length
 
     # sort info table in descending order
@@ -84,6 +84,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         pool = []
         scElements = []
         pkElements = []
+        elElements = []
 
         # Initialization
         for i in range(sequenceLength):
@@ -254,7 +255,8 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                                     f,t = startPair
                                     # print(i,j,f,t,len1,stem,l1,l2,l3)
                                     pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-                                    scElements.append([f,t,stem])
+                                    elElements.append([f,t,stem])
+                                    #scElements.append([f,t,stem])
                                     for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
                                         flag[x] = 1
                                         flag[y] = 1
@@ -330,7 +332,9 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                                         f,t = startPair
                                         # print(i,j,f,t,len1,stem,l1,l2,l3)
                                         pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-                                        scElements.append([f,t,stem])
+                                        elElements.append([f,t,stem])
+
+                                        #scElements.append([f,t,stem])
                                         for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
                                             flag[x] = 1
                                             flag[y] = 1
@@ -421,7 +425,7 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
                                     f,t = startPair
                                     # print(i,j,f,t,len1,stem,l1,l2,l3)
                                     pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-                                    scElements.append([f,t,stem])
+                                    #scElements.append([f,t,stem])
                                     for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
                                         flag[x] = 1
                                         flag[y] = 1
@@ -442,7 +446,6 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         # end for i,j,l1
 
         # print(PrintableMolecule(mol3),"mol2")
-
         # if(mol4!=mol2):
         #     print(PrintableMolecule(mol3),"mol2")
         #     print(PrintableMolecule(mol4),"mol4")
@@ -460,6 +463,16 @@ def GenerateMolecule(sequence, sequenceLength,popSize,infoTable):
         if(pkElements):
             pkEnergy = pk.PseudoknotHandler(scElements,pkElements,sequence)
             # print(pkEnergy)
+        # endif
+
+        # Minus first stem energy
+        elEnergy = 0
+        if(elElements):
+            for stem in elElements:
+                turnerEnergy -= energy.Turner04Handlar(stem,sequence)
+            # endfor
+        # endif
+
 
         totalEnergy = turnerEnergy+pkEnergy
 

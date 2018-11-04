@@ -25,9 +25,10 @@ class Molecule():
     pkElements = []      # A list of stems (pseudoknotted) take participate in making pseudoknot
     elements = []        # scElements + pkElements = uniqueElements
     def Mol(self,sequence, popSize, initialKE):
+        minStem = 2
         self.sequence = sequence
         dotplot = population.Checkerboard(sequence)
-        self.stemTable = population.FindDiagonal(sequence,dotplot)
+        self.stemTable = population.FindDiagonal(sequence,dotplot,minStem)
         self.infoTable = self.stemTable[:]  # Copying the varible to keep original one
         # print(self.infoTable,'before')
 

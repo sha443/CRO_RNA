@@ -22,8 +22,8 @@ class main():
 		print(sequence)
 		
 		# Parameters
-		iteration = 20
-		popSize = 20
+		iteration = 70
+		popSize = 50
 		KELossRate= 0.85
 		MoleColl= 0.30
 		InitialKE= 0
@@ -66,8 +66,8 @@ class main():
 		return sen,sp,f_m,tp,fp,fn,time,ene
 	# end function
 	def Test(self,filename):
-		db = "../data/database/cro.db"
-		path = "../data/cro/"
+		db = "../data/database/ipknot.db"
+		path = "../data/ipknot/"
 		# filename = "PKB1.txt" # Manual input
 		sen,sp,f1,tp,fp,fn,time,ene = main().run(filename,path)
 		time = float(time)
@@ -77,10 +77,10 @@ class main():
 # end
 # end class
 
-main().Test("BChV.txt")
+# main().Test("Sars-CoV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-# commandline = sys.argv
-# main().Test(commandline[1])
+commandline = sys.argv
+main().Test(commandline[1])

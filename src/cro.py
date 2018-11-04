@@ -306,7 +306,7 @@ class CRO():
 		moleculeSequence = []
 		scElements = []
 		pkElements = []
-
+		elElements = []
 		makePair = []
 		# Initialization
 		for i in range(len(mole.sequence)):
@@ -457,7 +457,9 @@ class CRO():
 									f,t = startPair
 									# print(i,j,f,t,len1,stem,l1,l2,l3)
 									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-									scElements.append([j,k,stem])
+									elElements.append([f,t,stem])
+
+									#scElements.append([j,k,stem])
 									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 										flag[x] = 1
 										flag[y] = 1
@@ -550,7 +552,7 @@ class CRO():
 		                            f,t = startPair
 		                            # print(i,j,f,t,len1,stem,l1,l2,l3)
 		                            pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-		                            scElements.append([f,t,stem])
+		                            #scElements.append([f,t,stem])
 		                            for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 		                                flag[x] = 1
 		                                flag[y] = 1
@@ -587,6 +589,15 @@ class CRO():
 		if(pkElements):
 			pkEnergy = pk.PseudoknotHandler(scElements,pkElements,sequence)
             # print(pkEnergy)
+        # endif
+
+		# Minus first stem energy
+		elEnergy = 0
+		if(elElements):
+		    for stem in elElements:
+		        turnerEnergy -= energy.Turner04Handlar(stem,sequence)
+		    # endfor
+		# endif
 
 		totalEnergy = turnerEnergy+pkEnergy
 
@@ -659,6 +670,7 @@ class CRO():
 		mol = []
 		scElements = []
 		pkElements = []
+		elElements = []
 
 		# Initialization
 		for i in range(size):
@@ -809,7 +821,9 @@ class CRO():
 									f,t = startPair
 									# print(i,j,f,t,len1,stem,l1,l2,l3)
 									pkElements.append([i,j,f,t,len1,stem,l1,l2,l3])
-									scElements.append([f,t,stem])
+									elElements.append([f,t,stem])
+
+									#scElements.append([f,t,stem])
 									for x,y in zip(range(f,f+stem,1),range(t,0,-1)):
 										flag[x] = 1
 										flag[y] = 1

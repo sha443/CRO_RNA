@@ -132,7 +132,8 @@ def CC06(pkCC06,seq):
 
 		# Calculate free energy for pseudoknot
 		# We want the loop entropy to be negative, hence + instead of - of the equation
-		pk_energy = stack_s1 + stack_s2 + (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
+		# Updated: no, it will be -, not + because I'm checking after the calculation
+		pk_energy = stack_s1 + stack_s2 - (entropy_l1 + entropy_l3 + 1.3 + coaxial_stacking)
 		# standard 0.0
 		if pk_energy < accEne:
 		    CC06Result[index] = pk_energy #, stack_s1, stack_s2, entropy_l1, 0.0, entropy_l3, coaxial_stacking 

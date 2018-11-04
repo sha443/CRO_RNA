@@ -139,3 +139,38 @@ Onwall= 33	Dec = 4	Syn = 13	Intermolecular = 0
 sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
 ...((((((.)))))).....	1.12
 Elapsed time 1.73 sec.
+======================================================
+Onwall= 10	Dec = 6	Syn = 14	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 0.44 sec
+======================================================
+Onwall= 19	Dec = 3	Syn = 8	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 0.33 sec
+======================================================
+Onwall= 17	Dec = 2	Syn = 11	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 0.18 sec
+======================================================
+Onwall= 20	Dec = 3	Syn = 7	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 0.23 sec
+======================================================
+Onwall= 36	Dec = 13	Syn = 21	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 10.97 sec
+======================================================
+Onwall= 32	Dec = 10	Syn = 28	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 7.80 sec
+======================================================
+Onwall= 37	Dec = 12	Syn = 21	Intermolecular = 0
+sen=62.50 	sp=83.33 	f_measure=71.43 	tp=5 	fp=1 	fn=3 
+...((((((.)))))).....	1.12
+Elapsed time 9.00 sec
