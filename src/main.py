@@ -19,16 +19,17 @@ class main():
 		# Clean up data
 		sequence = sequence.replace(' ', '')
 		sequence = sequence.upper()
+		minStem = func.getMinStem(len(sequence))
 		print(sequence)
 		
 		# Parameters
-		iteration = 10
-		popSize = 20
+		iteration = 70
+		popSize = 50
 		KELossRate= 0.85
 		MoleColl= 0.30
 		InitialKE= 0
 		alpha = 1
-		beta = 10
+		beta = 8
 		buffer = 0
 
 		# Timer starts
@@ -38,7 +39,7 @@ class main():
 		# Population generation
 		#----------------------------------------------------------------------------------------------
 		mole = Molecule()
-		mole.Mol(sequence, popSize, InitialKE)
+		mole.Mol(sequence, popSize, InitialKE,minStem)
 		
 		# # Save initial informations
 		# minEnergy = 99999
@@ -66,8 +67,8 @@ class main():
 		return sen,sp,f_m,tp,fp,fn,time,ene
 	# end function
 	def Test(self,filename):
-		path = "../data/sa/"
-		table = "sa"
+		path = "../data/ipknot/"
+		table = "ipknot"
 		# filename = "PKB1.txt" # Manual input
 		sen,sp,f1,tp,fp,fn,time,ene = main().run(filename,path)
 		time = float(time)
@@ -80,10 +81,10 @@ class main():
 #-----------------------------------------------------------------------------------------
 # Manual test area
 #-----------------------------------------------------------------------------------------
-main().Test("VMV.txt")
+# main().Test("BaEV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-# commandline = sys.argv
-# main().Test(commandline[1])
+commandline = sys.argv
+main().Test(commandline[1])

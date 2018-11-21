@@ -125,6 +125,7 @@ class Function():
 	# end function
 
 	def Performance(predicted,benchmark):
+		print(predicted)
 		true_basepair = 0
 		a = 0
 		c = 0
@@ -177,3 +178,19 @@ class Function():
 
 		return sensitivity,specificity,f_measure,true_basepair,false_positive_basepair,false_negative_basepair
     #End
+
+	def getMinStem(length):
+		if(length<30):
+			return 2
+		elif(length<80):
+			return 3
+		elif(length<150):
+			return 4
+		elif(length<250):
+			return 5
+		else:
+			return 6
+		# endif
+	# end function
+
+# end class

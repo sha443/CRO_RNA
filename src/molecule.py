@@ -24,8 +24,7 @@ class Molecule():
     scElements = []      # A list of stems (may be shortened) take participate in secondary structure
     pkElements = []      # A list of stems (pseudoknotted) take participate in making pseudoknot
     elements = []        # scElements + pkElements = uniqueElements
-    def Mol(self,sequence, popSize, initialKE):
-        minStem = 2
+    def Mol(self,sequence, popSize, initialKE,minStem):
         self.sequence = sequence
         dotplot = population.Checkerboard(sequence)
         self.stemTable = population.FindDiagonal(sequence,dotplot,minStem)

@@ -1,1 +1,1 @@
-select avg(Sen),avg(Sp),avg(F1) from performance
+select avg(Sen),avg(Sp),avg(F1) from hk

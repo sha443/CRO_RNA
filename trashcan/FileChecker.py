@@ -1,10 +1,12 @@
+# Uncomment each segment and run
+
 import os
 import shutil
 from os import path
 
-directory = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/ipknot/input/'
-inD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/ipknot/benchmark/'
-outD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/ipknot/benchmarkVal/'
+directory = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/input/'
+inD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/benchmark/'
+outD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/benchmarkVal/'
 
 # Move
 # for fileName in os.listdir(directory):
@@ -17,26 +19,26 @@ outD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/ipknot/benchmarkVal/
 # # end for
 
 
-# Compare
-# sl = 1
-# for fileName in os.listdir(directory):
+# Check if all files in input directory also exist in benchmark directory
+sl = 1
+for fileName in os.listdir(directory):
 
-# 	src = directory+fileName
-# 	dst = outD+fileName
-# 	if(path.exists(dst)):
-# 		continue
-# 	else:
-# 		print(sl,fileName)
-# 		sl+=1
-# # end for
+	src = directory+fileName
+	dst = inD+fileName
+	if(path.exists(dst)):
+		continue
+	else:
+		print(sl,fileName)
+		sl+=1
+# end for
 
-# print list
+# print list of files in a directory
 # for fileName in os.listdir(directory):
 # 	print(fileName)
 # end for
 
 
-# # Sequence length
+# # Sequence length range
 # min=1000
 # max=0
 # directory = 'E:/HelloWorld/RNA/RSPPk/data/cro/input/'
