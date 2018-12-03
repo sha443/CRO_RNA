@@ -19,6 +19,13 @@ def updateDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene):
 	conn.commit()
 	conn.close()
 # end function
+def updateTime(table,filename,time):
+	conn = sqlite3.connect(db)
+	c = conn.cursor()
+	c.execute("UPDATE "+table+" SET ET= %.2f WHERE Filename = '%s'" % (float(time),filename))
+	conn.commit()
+	conn.close()
+# end function
 
 def fetchDB(table,filename):
 	conn = sqlite3.connect(db)
@@ -30,6 +37,19 @@ def fetchDB(table,filename):
 		f1 = data[3]
 		conn.close()
 		return f1
+	else:
+		return -1
+# end function
+def fetchTime(table,filename):
+	conn = sqlite3.connect(db)
+	c = conn.cursor()
+	c.execute("SELECT ET FROM "+table+"  WHERE Filename = '%s'" % filename)
+	data = c.fetchone()
+	
+	if(data):
+		time = data[0]
+		conn.close()
+		return time
 	else:
 		return -1
 # end function
@@ -64,6 +84,7 @@ def printTable(table):
 #-----------------------------------------------------------------------------------------
 def helperDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene):
 	res = fetchDB(table,filename)
+	timePre = fetchTime(table,filename)
 	if(res==-1):
 		# No entry, insertDB
 		insertDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene)
@@ -71,6 +92,8 @@ def helperDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene):
 		# Check if we have a better output
 		if(res<f1):
 			updateDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene)
+		elif(timePre>time):
+			updateTime(table,filename,time)
 		# enfif
 	# endif
 	print("---------------------------------------------------------------")

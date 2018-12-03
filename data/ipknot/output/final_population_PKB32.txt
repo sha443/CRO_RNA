@@ -199,3 +199,8 @@ Onwall= 42	Dec = 11	Syn = 17	Intermolecular = 0
 sen=66.67 	sp=100.00 	f_measure=80.00 	tp=6 	fp=0 	fn=3 
 ..................((((((.....))))))...	-6.19
 Elapsed time 6.44 sec
+======================================================
+Onwall= 32	Dec = 17	Syn = 21	Intermolecular = 0
+sen=33.33 	sp=30.00 	f_measure=31.58 	tp=3 	fp=7 	fn=6 
+((((((...........((((.))))))))))......	-7.64
+Elapsed time 2.19 sec
