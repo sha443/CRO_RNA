@@ -20,16 +20,18 @@ class main():
 		sequence = sequence.replace(' ', '')
 		sequence = sequence.upper()
 		minStem = func.getMinStem(len(sequence))
+		# # Override rule
+		minStem = 2
 		print(sequence)
 		
 		# Parameters
-		iteration = 70
+		iteration = 80
 		popSize = 50
-		KELossRate= 0.85
+		KELossRate= 0.55
 		MoleColl= 0.30
 		InitialKE= 0
-		alpha = 1
-		beta = 8
+		alpha = 8
+		beta = 2
 		buffer = 0
 
 		# Timer starts
@@ -67,13 +69,12 @@ class main():
 		return sen,sp,f_m,tp,fp,fn,time,ene
 	# end function
 	def Test(self,filename):
-		path = "../data/ipknot/"
-		table = "ipknot"
+		path = "../data/dk/"
+		table = "dk"
 		# filename = "PKB1.txt" # Manual input
 		sen,sp,f1,tp,fp,fn,time,ene = main().run(filename,path)
 		time = float(time)
 		ene = float(ene)
-
 		sqlite.helperDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene)
 # end
 # end class
@@ -81,7 +82,7 @@ class main():
 #-----------------------------------------------------------------------------------------
 # Manual test area
 #-----------------------------------------------------------------------------------------
-main().Test("PKB206.txt")
+main().Test("RF00507_SARSCoV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area

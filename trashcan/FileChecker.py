@@ -4,13 +4,13 @@ import os
 import shutil
 from os import path
 
-directory = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/input/'
+directory = 'E:/HelloWorld/RNA/RSPPk/data/hk_short/benchmark/'
 inD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/benchmark/'
 outD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/benchmarkVal/'
 
 # Move
-# for fileName in os.listdir(directory):
-# 	print(fileName)
+for fileName in os.listdir(directory):
+	print(fileName)
 
 # 	src = inD+fileName
 # 	dst = outD+fileName
@@ -19,18 +19,18 @@ outD = '/media/shahid/EDUCATIONAL/HelloWorld/RNA/RSPPk/data/hk_long/benchmarkVal
 # # end for
 
 
-# Check if all files in input directory also exist in benchmark directory
-sl = 1
-for fileName in os.listdir(directory):
+# # Check if all files in input directory also exist in benchmark directory
+# sl = 1
+# for fileName in os.listdir(directory):
 
-	src = directory+fileName
-	dst = inD+fileName
-	if(path.exists(dst)):
-		continue
-	else:
-		print(sl,fileName)
-		sl+=1
-# end for
+# 	src = directory+fileName
+# 	dst = inD+fileName
+# 	if(path.exists(dst)):
+# 		continue
+# 	else:
+# 		print(sl,fileName)
+# 		sl+=1
+# # end for
 
 # print list of files in a directory
 # for fileName in os.listdir(directory):
