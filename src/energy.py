@@ -1,6 +1,6 @@
 import math
 import os
-accEne = 10.0
+accEne = 0.0
 # Loop entropy for loop L1 and stem S2 (deep groove)
 # First entry is loop size, second entry is stem size    
 loop1_dic_cc ={

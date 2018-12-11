@@ -69,3 +69,98 @@ Onwall= 25	Dec = 8	Syn = 7	Intermolecular = 0
 sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
 .......((((((..............)))))).	-9.25
 Elapsed time 2.56 sec
+======================================================
+Onwall= 55	Dec = 0	Syn = 25	Intermolecular = 0
+sen=66.67 	sp=100.00 	f_measure=80.00 	tp=8 	fp=0 	fn=4 
+..[[...((((((.......]]....))))))..	-14.54
+Elapsed time 0.21 sec
+======================================================
+Onwall= 71	Dec = 0	Syn = 28	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.12 sec
+======================================================
+Onwall= 71	Dec = 0	Syn = 28	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.13 sec
+======================================================
+Onwall= 72	Dec = 0	Syn = 27	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.12 sec
+======================================================
+Onwall= 71	Dec = 0	Syn = 28	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.14 sec
+======================================================
+Onwall= 63	Dec = 0	Syn = 37	Intermolecular = 0
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.12 sec
+======================================================
+Onwall= 71	Dec = 0	Syn = 29	Intermolecular = 0
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.10 sec
+======================================================
+Onwall= 73	Dec = 0	Syn = 26	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.15 sec
+======================================================
+Onwall= 139	Dec = 0	Syn = 59	Intermolecular = 2
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.26 sec
+======================================================
+Onwall= 130	Dec = 2	Syn = 66	Intermolecular = 2
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.80 sec
+======================================================
+Onwall= 151	Dec = 0	Syn = 49	Intermolecular = 0
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.21 sec
+======================================================
+Onwall= 129	Dec = 0	Syn = 69	Intermolecular = 2
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.21 sec
+======================================================
+Onwall= 136	Dec = 0	Syn = 63	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.23 sec
+======================================================
+Onwall= 142	Dec = 0	Syn = 39	Intermolecular = 19
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((.............))))))..	-8.40
+Elapsed time 0.91 sec
+======================================================
+Onwall= 141	Dec = 0	Syn = 54	Intermolecular = 5
+sen=83.33 	sp=100.00 	f_measure=90.91 	tp=10 	fp=0 	fn=2 
+.[[[[..((((((......]]]]...))))))..	-23.07
+Elapsed time 0.34 sec
+======================================================
+Onwall= 138	Dec = 0	Syn = 61	Intermolecular = 1
+sen=50.00 	sp=100.00 	f_measure=66.67 	tp=6 	fp=0 	fn=6 
+.......((((((..............)))))).	-9.25
+Elapsed time 0.20 sec
+======================================================
+Onwall= 147	Dec = 0	Syn = 53	Intermolecular = 0
+sen=91.67 	sp=91.67 	f_measure=91.67 	tp=11 	fp=1 	fn=1 
+.[[[[[[((((((..]]]].]]....))))))..	-33.89
+Elapsed time 0.47 sec
+======================================================
+Onwall= 140	Dec = 0	Syn = 60	Intermolecular = 0
+sen=66.67 	sp=100.00 	f_measure=80.00 	tp=8 	fp=0 	fn=4 
+..[[...((((((.......]]....))))))..	-14.54
+Elapsed time 0.42 sec
+======================================================
+Onwall= 140	Dec = 0	Syn = 59	Intermolecular = 1
+sen=66.67 	sp=100.00 	f_measure=80.00 	tp=8 	fp=0 	fn=4 
+..[[...((((((.......]]....))))))..	-14.54
+Elapsed time 0.49 sec

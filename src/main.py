@@ -21,17 +21,17 @@ class main():
 		sequence = sequence.upper()
 		minStem = func.getMinStem(len(sequence))
 		# # Override rule
-		minStem = 2
+		minStem = 3
 		print(sequence)
 		
 		# Parameters
-		iteration = 80
-		popSize = 50
+		iteration = 100
+		popSize = 70
 		KELossRate= 0.55
 		MoleColl= 0.30
 		InitialKE= 0
-		alpha = 8
-		beta = 2
+		alpha = 2
+		beta = 8
 		buffer = 0
 
 		# Timer starts
@@ -82,10 +82,10 @@ class main():
 #-----------------------------------------------------------------------------------------
 # Manual test area
 #-----------------------------------------------------------------------------------------
-main().Test("RF00507_SARSCoV.txt")
+# main().Test("GaLV.txt")
 
 #-----------------------------------------------------------------------------------------
 # Command line processing area
 #-----------------------------------------------------------------------------------------
-# commandline = sys.argv
-# main().Test(commandline[1])
+commandline = sys.argv
+main().Test(commandline[1])

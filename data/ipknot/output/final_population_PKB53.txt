@@ -199,3 +199,38 @@ Onwall= 40	Dec = 4	Syn = 26	Intermolecular = 0
 sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
 ...(((((((..)))))))...	-1.41
 Elapsed time 1.32 sec
+======================================================
+Onwall= 50	Dec = 17	Syn = 33	Intermolecular = 0
+sen=42.86 	sp=50.00 	f_measure=46.15 	tp=3 	fp=3 	fn=4 
+((((((...)))))).......	-6.58
+Elapsed time 9.84 sec
+======================================================
+Onwall= 49	Dec = 14	Syn = 37	Intermolecular = 0
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 9.73 sec
+======================================================
+Onwall= 56	Dec = 13	Syn = 31	Intermolecular = 0
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 4.35 sec
+======================================================
+Onwall= 81	Dec = 23	Syn = 44	Intermolecular = 2
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 18.65 sec
+======================================================
+Onwall= 51	Dec = 3	Syn = 15	Intermolecular = 1
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 0.45 sec
+======================================================
+Onwall= 53	Dec = 4	Syn = 13	Intermolecular = 0
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 0.30 sec
+======================================================
+Onwall= 48	Dec = 2	Syn = 20	Intermolecular = 0
+sen=85.71 	sp=85.71 	f_measure=85.71 	tp=6 	fp=1 	fn=1 
+...(((((((..)))))))...	-1.41
+Elapsed time 0.26 sec

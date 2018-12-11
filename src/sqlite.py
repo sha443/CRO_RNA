@@ -92,8 +92,8 @@ def helperDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene):
 		# Check if we have a better output
 		if(res<f1):
 			updateDB(table,filename,sen,sp,f1,tp,fp,fn,time,ene)
-		elif(timePre>time):
-			updateTime(table,filename,time)
+		# elif(timePre<time):
+		# 	updateTime(table,filename,time)
 		# enfif
 	# endif
 	print("---------------------------------------------------------------")
